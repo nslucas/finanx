@@ -24,12 +24,9 @@ public class UserService {
         return repository.findAll();
     }
 
-    public Optional<User> findById(Long id){
-        Optional<User> user = repository.findById(id);
-        if (user == null) {
-            throw new ObjectNotFoundException("Object not found!");
-        }
-        return user;
+    public User findById(Long id) {
+        Optional<User> optionalUser = repository.findById(id);
+        return optionalUser.orElseThrow(() -> new ObjectNotFoundException("Object not found!"));
     }
 
     public User insert(User obj) {
@@ -40,11 +37,21 @@ public class UserService {
         findById(id);
         repository.deleteById(id);
     }
-    
+
+    public User update(User obj){
+        User newObj = repository.getReferenceById(obj.getId());
+        updateData(newObj, obj);
+        return repository.save(newObj);
+    }
+
+    private void updateData(User newObj, User obj) {
+        newObj.setName(obj.getName());
+        newObj.setLastName(obj.getLastName());
+        newObj.setEmail(obj.getEmail());
+    }
+
     public User fromDTO(UserDTO objDTO){
         return new User(objDTO.getId(), objDTO.getName(), objDTO.getLastName(), objDTO.getEmail());
     }
-    
-    
 
 }

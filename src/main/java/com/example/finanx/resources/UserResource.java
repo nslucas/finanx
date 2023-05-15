@@ -29,8 +29,8 @@ public class UserResource {
 
     @GetMapping(value="/{id}")
     public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
-        Optional<User> obj = service.findById(id);
-        return ResponseEntity.ok().body(new UserDTO());
+        User obj = service.findById(id);
+        return ResponseEntity.ok().body(new UserDTO(obj));
     }
 
     @PostMapping
@@ -47,4 +47,11 @@ public class UserResource {
         return ResponseEntity.noContent().build();
     }
 
+    @PutMapping(value="/{id}")
+    public ResponseEntity<Void> update(@RequestBody UserDTO objDTO, @PathVariable Long id) {
+        User obj = service.fromDTO(objDTO);
+        obj.setId(id);
+        obj = service.update(obj);
+        return ResponseEntity.noContent().build();
+    }
 }
