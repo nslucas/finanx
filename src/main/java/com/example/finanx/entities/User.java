@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.List;
 
 @Entity
 @Table(name="user")
@@ -13,9 +14,11 @@ public class User implements Serializable {
     private Long id;
     private String name;
     private String lastName;
-    private Date birthDate;
+    private Double monthLimit;
     private String email;
     private String password;
+    @OneToMany(mappedBy = "user")
+    private List<Expense> expenses;
 
     public User() {
     }
@@ -59,6 +62,14 @@ public class User implements Serializable {
         this.lastName = lastName;
     }
 
+    public Double getMonthLimit() {
+        return monthLimit;
+    }
+
+    public void setMonthLimit(Double monthLimit) {
+        this.monthLimit = monthLimit;
+    }
+
     public String getEmail() {
         return email;
     }
@@ -73,5 +84,9 @@ public class User implements Serializable {
 
     public void setPassword(String password) {
         this.password = password;
+    }
+
+    public List<Expense> getExpenses() {
+        return expenses;
     }
 }
