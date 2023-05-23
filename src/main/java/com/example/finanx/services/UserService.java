@@ -1,6 +1,6 @@
 package com.example.finanx.services;
 
-import com.example.finanx.dto.UserDTO;
+import com.example.finanx.dto.UserRecord;
 import com.example.finanx.entities.User;
 import com.example.finanx.exception.ObjectNotFoundException;
 import com.example.finanx.repositories.UserRepository;
@@ -50,8 +50,8 @@ public class UserService {
         newObj.setEmail(obj.getEmail());
     }
 
-    public User fromDTO(UserDTO objDTO){
-        return new User(objDTO.getId(), objDTO.getName(), objDTO.getLastName(), objDTO.getEmail());
+    public User fromDTO(UserRecord objDTO){
+        return new User(objDTO.id(), objDTO.name(), objDTO.lastName(), objDTO.monthLimit(), objDTO.email(), objDTO.password());
     }
 
 }

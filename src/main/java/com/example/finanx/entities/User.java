@@ -3,12 +3,11 @@ package com.example.finanx.entities;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
-import java.util.Date;
 import java.util.List;
 
 @Entity
 @Table(name="user")
-public class User implements Serializable {
+public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -23,17 +22,11 @@ public class User implements Serializable {
     public User() {
     }
 
-    public User(Long id, String name, String lastName, String email){
+    public User(Long id, String name, String lastName, Double monthLimit, String email, String password) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
-        this.email = email;
-    }
-
-    public User(Long id, String name, String lastName, String email, String password) {
-        this.id = id;
-        this.name = name;
-        this.lastName = lastName;
+        this.monthLimit = monthLimit;
         this.email = email;
         this.password = password;
     }
@@ -89,4 +82,5 @@ public class User implements Serializable {
     public List<Expense> getExpenses() {
         return expenses;
     }
+
 }

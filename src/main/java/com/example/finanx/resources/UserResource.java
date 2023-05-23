@@ -1,6 +1,6 @@
 package com.example.finanx.resources;
 
-import com.example.finanx.dto.UserDTO;
+import com.example.finanx.dto.UserRecord;
 import com.example.finanx.entities.User;
 import com.example.finanx.services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,7 +10,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @RestController
@@ -21,20 +20,19 @@ public class UserResource {
     private UserService service;
 
     @GetMapping
-    public ResponseEntity<List<UserDTO>> findAll(){
-        List<User> list = service.findAll();
-        List<UserDTO> listDTO = list.stream().map(x -> new UserDTO(x)).collect(Collectors.toList());
-        return ResponseEntity.ok().body(listDTO);
+    public ResponseEntity<List<UserRecord>> findAll(){
+        List<UserRecord> list = service.findAll().stream().map(UserRecord::new).toList();
+        return ResponseEntity.ok().body(list);
     }
 
     @GetMapping(value="/{id}")
-    public ResponseEntity<UserDTO> findById(@PathVariable Long id) {
+    public ResponseEntity<UserRecord> findById(@PathVariable Long id) {
         User obj = service.findById(id);
-        return ResponseEntity.ok().body(new UserDTO(obj));
+        return ResponseEntity.ok().body(new UserRecord(obj));
     }
 
     @PostMapping
-        public ResponseEntity<Void> insert(@RequestBody UserDTO objDTO) {
+        public ResponseEntity<Void> insert(@RequestBody UserRecord objDTO) {
         User obj = service.fromDTO(objDTO);
         obj = service.insert(obj);
         URI uri = ServletUriComponentsBuilder.fromCurrentRequest().path("/{id}").buildAndExpand(obj.getId()).toUri();
@@ -48,7 +46,7 @@ public class UserResource {
     }
 
     @PutMapping(value="/{id}")
-    public ResponseEntity<Void> update(@RequestBody UserDTO objDTO, @PathVariable Long id) {
+    public ResponseEntity<Void> update(@RequestBody UserRecord objDTO, @PathVariable Long id) {
         User obj = service.fromDTO(objDTO);
         obj.setId(id);
         obj = service.update(obj);

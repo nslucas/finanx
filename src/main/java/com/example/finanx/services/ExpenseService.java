@@ -1,15 +1,12 @@
 package com.example.finanx.services;
 
+import com.example.finanx.dto.ExpenseRecord;
 import com.example.finanx.entities.Expense;
-import com.example.finanx.entities.User;
-import com.example.finanx.exception.LimitExceededException;
 import com.example.finanx.exception.ObjectNotFoundException;
 import com.example.finanx.repositories.ExpenseRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.time.LocalDate;
 import java.util.List;
 
 @Service
@@ -21,21 +18,24 @@ public class ExpenseService {
         this.expenseRepository = expenseRepository;
     }
 
-    public List<User> getAllExpenses() {
+    public List<Expense> getAllExpenses() {
         return expenseRepository.findAll();
     }
 
-    public User getExpenseById(Long id) {
+
+    public Expense getExpenseById(Long id) {
         return expenseRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Expense not found with id: " + id));
     }
 
-    public Expense createExpense(Expense expense) {
-        validateExpenseValue(expense.getAmount(), expense.getUser().getMonthLimit());
-
-        return expenseRepository.save(expense);
+    public Expense insert(Expense obj) {
+        return expenseRepository.save(obj);
     }
-
+   public Expense fromDTO(ExpenseRecord objDTO){
+        return new Expense(objDTO.id(), objDTO.amount(), objDTO.name(), objDTO.description(), objDTO.user());
+    }
+}
+    /*
     public Expense updateExpense(Long id, Expense updatedExpense) {
         Expense expense = getExpenseById(id);
         validateExpenseValue(updatedExpense.getAmount(), expense.getUser().getMonthLimit());
@@ -53,11 +53,7 @@ public class ExpenseService {
         expenseRepository.deleteById(id);
     }
 
-    private void validateExpenseValue(BigDecimal expenseValue, Double monthLimit) {
-        BigDecimal currentMonthExpenses = expenseRepository.sumExpensesByUserAndMonth(expenseValue, LocalDate.now());
 
-        if (currentMonthExpenses.add(expenseValue).compareTo(BigDecimal.valueOf(monthLimit)) > 0) {
-            throw new LimitExceededException("Expense value exceeds the monthly limit.");
-        }
-    }
-}
+     */
+
+

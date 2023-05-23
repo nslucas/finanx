@@ -1,7 +1,6 @@
 package com.example.finanx.entities;
 import jakarta.persistence.*;
 
-import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Entity
@@ -11,7 +10,7 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
-    private BigDecimal amount;
+    private Double amount;
     private String name;
     private Integer installmentCount;
     private LocalDate purchaseDate;
@@ -20,10 +19,10 @@ public class Expense {
     @JoinColumn(name = "user_id")
     private User user;
 
-    public Expense() {
+    public Expense(Long id, Double amount, String name, String description) {
     }
 
-    public Expense(Long id, BigDecimal amount, String name, String description, User user) {
+    public Expense(Long id, Double amount, String name, String description, User user) {
         this.id = id;
         this.amount = amount;
         this.name = name;
@@ -39,11 +38,11 @@ public class Expense {
         this.id = id;
     }
 
-    public BigDecimal getAmount() {
+    public Double getAmount() {
         return amount;
     }
 
-    public void setAmount(BigDecimal amount) {
+    public void setAmount(Double amount) {
         this.amount = amount;
     }
 
@@ -83,7 +82,4 @@ public class Expense {
         return user;
     }
 
-    public void setUser(User user) {
-        this.user = user;
-    }
 }
