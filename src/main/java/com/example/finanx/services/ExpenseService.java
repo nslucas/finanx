@@ -32,7 +32,7 @@ public class ExpenseService {
         return expenseRepository.save(obj);
     }
    public Expense fromDTO(ExpenseRecord objDTO){
-        return new Expense(objDTO.id(), objDTO.amount(), objDTO.name(), objDTO.description(), objDTO.user());
+        return new Expense(objDTO.id(), objDTO.amount(), objDTO.name(), objDTO.installmentCount(), objDTO.purchaseDate(), objDTO.description(), objDTO.userId());
     }
 }
     /*

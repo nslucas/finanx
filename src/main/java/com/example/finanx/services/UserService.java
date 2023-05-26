@@ -47,6 +47,7 @@ public class UserService {
     private void updateData(User newObj, User obj) {
         newObj.setName(obj.getName());
         newObj.setLastName(obj.getLastName());
+        newObj.setMonthLimit(obj.getMonthLimit());
         newObj.setEmail(obj.getEmail());
     }
 

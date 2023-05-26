@@ -16,7 +16,7 @@ public class User {
     private Double monthLimit;
     private String email;
     private String password;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "userId")
     private List<Expense> expenses;
 
     public User() {

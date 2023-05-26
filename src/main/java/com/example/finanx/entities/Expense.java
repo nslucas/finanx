@@ -1,7 +1,7 @@
 package com.example.finanx.entities;
 import jakarta.persistence.*;
-
-import java.time.LocalDate;
+import org.springframework.cglib.core.Local;
+import java.util.Date;
 
 @Entity
 @Table(name="expense")
@@ -13,21 +13,20 @@ public class Expense {
     private Double amount;
     private String name;
     private Integer installmentCount;
-    private LocalDate purchaseDate;
+    private Date purchaseDate;
     private String description;
-    @ManyToOne
-    @JoinColumn(name = "user_id")
-    private User user;
+    private Long userId;
 
-    public Expense(Long id, Double amount, String name, String description) {
-    }
+    public Expense(){}
 
-    public Expense(Long id, Double amount, String name, String description, User user) {
+    public Expense(Long id, Double amount, String name, Integer installmentCount, Date purchaseDate, String description, Long userId) {
         this.id = id;
         this.amount = amount;
         this.name = name;
+        this.installmentCount = installmentCount;
+        this.purchaseDate = purchaseDate;
         this.description = description;
-        this.user = user;
+        this.userId = userId;
     }
 
     public Long getId() {
@@ -62,11 +61,11 @@ public class Expense {
         this.installmentCount = installmentCount;
     }
 
-    public LocalDate getPurchaseDate() {
+    public Date getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(LocalDate purchaseDate) {
+    public void setPurchaseDate(Date purchaseDate) {
         this.purchaseDate = purchaseDate;
     }
 
@@ -78,8 +77,11 @@ public class Expense {
         this.description = description;
     }
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
 }
