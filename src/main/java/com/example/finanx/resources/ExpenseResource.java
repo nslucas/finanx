@@ -1,6 +1,7 @@
 package com.example.finanx.resources;
 
 import com.example.finanx.dto.ExpenseRecord;
+import com.example.finanx.dto.UserRecord;
 import com.example.finanx.entities.Expense;
 import com.example.finanx.entities.User;
 import com.example.finanx.exception.ObjectNotFoundException;
@@ -18,33 +19,22 @@ public class ExpenseResource {
 
     @Autowired
     private ExpenseService service;
-    @Autowired
-    private UserService userService;
-
 
     @GetMapping
-    public ResponseEntity<List<Expense>> findAll(){
-        List<Expense> list = service.getAllExpenses();
+    public ResponseEntity<List<ExpenseRecord>> findAll(){
+        List<ExpenseRecord> list = service.getAllExpenses().stream().map(ExpenseRecord::new).toList();
         return ResponseEntity.ok().body(list);
     }
 
-    @GetMapping(value="/id")
-    public ResponseEntity<Expense> findById(@PathVariable Long id){
+    @GetMapping(value="/{id}")
+    public ResponseEntity<Expense> findById(@PathVariable String id){
         Expense obj = service.getExpenseById(id);
         return ResponseEntity.ok().body(obj);
     }
 
     @PostMapping
-    public ResponseEntity<String> createExpense(@RequestBody ExpenseRecord objDTO, @RequestParam Long userId) {
-        Long user = userService.findById(userId).getId();
-        Expense expense = new Expense();
-        expense.setAmount(objDTO.amount());
-        expense.setName(objDTO.name());
-        expense.setInstallmentCount(objDTO.installmentCount());
-        expense.setPurchaseDate(objDTO.purchaseDate());
-        expense.setDescription(objDTO.description());
-        expense.setUserId(user);
-        service.insert(expense);
+    public ResponseEntity<String> createExpense(@RequestBody ExpenseRecord objDTO) {
+        Expense expense = service.createExpense(objDTO);
         return ResponseEntity.ok("Expense created successfully.");
     }
 

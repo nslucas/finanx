@@ -1,6 +1,7 @@
 package com.example.finanx.entities;
+import com.fasterxml.jackson.annotation.JsonBackReference;
 import jakarta.persistence.*;
-import org.springframework.cglib.core.Local;
+
 import java.util.Date;
 
 @Entity
@@ -8,32 +9,35 @@ import java.util.Date;
 public class Expense {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    @GeneratedValue(strategy = GenerationType.UUID)
+    private String id;
     private Double amount;
     private String name;
     private Integer installmentCount;
     private Date purchaseDate;
     private String description;
-    private Long userId;
+    @ManyToOne
+    @JoinColumn(name="userId")
+    @JsonBackReference
+    private User user;
 
     public Expense(){}
 
-    public Expense(Long id, Double amount, String name, Integer installmentCount, Date purchaseDate, String description, Long userId) {
+    public Expense(String id, Double amount, String name, Integer installmentCount, Date purchaseDate, String description, User user) {
         this.id = id;
         this.amount = amount;
         this.name = name;
         this.installmentCount = installmentCount;
         this.purchaseDate = purchaseDate;
         this.description = description;
-        this.userId = userId;
+        this.user = user;
     }
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void String(String id) {
         this.id = id;
     }
 
@@ -77,11 +81,11 @@ public class Expense {
         this.description = description;
     }
 
-    public Long getUserId() {
-        return userId;
+    public User getUser() {
+        return user;
     }
 
-    public void setUserId(Long userId) {
-        this.userId = userId;
+    public void setUser(User user) {
+        this.user = user;
     }
 }

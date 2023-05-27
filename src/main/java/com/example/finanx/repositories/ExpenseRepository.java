@@ -9,6 +9,6 @@ import java.math.BigDecimal;
 import java.time.LocalDate;
 
 @Repository
-public interface ExpenseRepository extends JpaRepository<Expense, Long> {
+public interface ExpenseRepository extends JpaRepository<Expense, String> {
 }
 

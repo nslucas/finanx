@@ -1,5 +1,6 @@
 package com.example.finanx.entities;
 
+import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
@@ -16,7 +17,8 @@ public class User {
     private Double monthLimit;
     private String email;
     private String password;
-    @OneToMany(mappedBy = "userId")
+    @OneToMany(mappedBy = "user")
+    @JsonManagedReference
     private List<Expense> expenses;
 
     public User() {
