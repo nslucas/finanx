@@ -24,6 +24,15 @@ public class User {
     public User() {
     }
 
+    public User(Long id, String name, String lastName, Double monthLimit, String email) {
+        this.id = id;
+        this.name = name;
+        this.lastName = lastName;
+        this.monthLimit = monthLimit;
+        this.email = email;
+    }
+
+
     public User(Long id, String name, String lastName, Double monthLimit, String email, String password) {
         this.id = id;
         this.name = name;

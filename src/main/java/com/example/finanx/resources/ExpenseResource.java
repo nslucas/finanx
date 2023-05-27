@@ -27,9 +27,10 @@ public class ExpenseResource {
     }
 
     @GetMapping(value="/{id}")
-    public ResponseEntity<Expense> findById(@PathVariable String id){
+    public ResponseEntity<ExpenseRecord> findById(@PathVariable String id){
         Expense obj = service.getExpenseById(id);
-        return ResponseEntity.ok().body(obj);
+        ExpenseRecord expenseRecord = new ExpenseRecord(obj.getId(), obj.getAmount(), obj.getName(), obj.getInstallmentCount(), obj.getPurchaseDate(), obj.getDescription(), new UserRecord(obj.getUser()));
+        return ResponseEntity.ok().body(expenseRecord);
     }
 
     @PostMapping

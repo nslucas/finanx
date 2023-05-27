@@ -34,7 +34,7 @@ public class ExpenseService {
     }
 
         public Expense createExpense(ExpenseRecord obj) {
-            User user =  userService.findById(obj.user().getId());
+            User user =  userService.findById(obj.user().id());
             Expense expense = fromDTO(obj, user);
             return expenseRepository.save(expense);
         }

@@ -88,4 +88,8 @@ public class Expense {
     public void setUser(User user) {
         this.user = user;
     }
+
+    public Long getUserId(){
+        return user != null ? user.getId() : null;
+    }
 }

@@ -32,7 +32,7 @@ public class Instantiation implements CommandLineRunner {
 
         User lucas = new User(null,"Lucas", "Nunes Santos", 3500.0, "lucasnunes.santos088@gmail.com", "Lu@25462933001!");
         User tais = new User(null, "Tais", "Fraga Batista", 4000.0, "taisfraga2010@hotmail.com", "tais123");
-        User rodrigo = new User(null, "Rodrigo", "Babisque", 10000.0, "taisfraga2010@hotmail.com", "rodrigo321");
+        User rodrigo = new User(null, "Rodrigo", "Babisque", 10000.0, "rodrigo.babisque@hotmail.com", "rodrigo321");
         userRepository.saveAll(Arrays.asList(lucas, tais, rodrigo));
 
         Expense expense1 = new Expense(null, 2000.0, "Curso Java - do Básico ao Avançado!", 5, sdf.parse("24/05/2023"), "curso pra aprender a fazer API", lucas);
