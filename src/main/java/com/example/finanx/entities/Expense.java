@@ -1,5 +1,5 @@
 package com.example.finanx.entities;
-import com.fasterxml.jackson.annotation.JsonBackReference;
+import com.example.finanx.dto.UserRecord;
 import jakarta.persistence.*;
 
 import java.util.Date;
@@ -16,21 +16,18 @@ public class Expense {
     private Integer installmentCount;
     private Date purchaseDate;
     private String description;
-    @ManyToOne
-    @JoinColumn(name="userId")
-    @JsonBackReference
-    private User user;
+    private Long userId;
 
     public Expense(){}
 
-    public Expense(String id, Double amount, String name, Integer installmentCount, Date purchaseDate, String description, User user) {
+    public Expense(String id, Double amount, String name, Integer installmentCount, Date purchaseDate, String description, Long userId) {
         this.id = id;
         this.amount = amount;
         this.name = name;
         this.installmentCount = installmentCount;
         this.purchaseDate = purchaseDate;
         this.description = description;
-        this.user = user;
+        this.userId = userId;
     }
 
     public String getId() {
@@ -81,15 +78,15 @@ public class Expense {
         this.description = description;
     }
 
-    public User getUser() {
-        return user;
+    public void setId(String id) {
+        this.id = id;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
-    public Long getUserId(){
-        return user != null ? user.getId() : null;
+    public Long getUserId() {
+        return userId;
     }
 }

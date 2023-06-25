@@ -4,6 +4,9 @@ import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 @Entity
@@ -17,7 +20,7 @@ public class User {
     private Double monthLimit;
     private String email;
     private String password;
-    @OneToMany(mappedBy = "user")
+    @OneToMany(mappedBy = "userId")
     @JsonManagedReference
     private List<Expense> expenses;
 
@@ -90,8 +93,34 @@ public class User {
         this.password = password;
     }
 
-    public List<Expense> getExpenses() {
-        return expenses;
+    /*public void addExpense(Expense expense) {
+        if (expenses == null) {
+            expenses = new ArrayList<>();
+        }
+        double totalExpenses = expenses.stream()
+                .filter(e -> isSameMonth(e.getPurchaseDate()))
+                .mapToDouble(Expense::getAmount)
+                .sum();
+
+        if (totalExpenses + expense.getAmount() > monthLimit) {
+            throw new RuntimeException("Limite de despesas atingido para o mês.");
     }
 
-}
+     */
+        /*private boolean isSameMonth(Date date) {
+            Calendar currentMonth = Calendar.getInstance();
+            Calendar targetMonth = Calendar.getInstance();
+            targetMonth.setTime(date);
+
+            int currentYear = currentMonth.get(Calendar.YEAR);
+            int currentMonthValue = currentMonth.get(Calendar.MONTH);
+            int targetYear = targetMonth.get(Calendar.YEAR);
+            int targetMonthValue = targetMonth.get(Calendar.MONTH);
+
+            return currentYear == targetYear && currentMonthValue == targetMonthValue;
+        }
+
+         */
+
+    }
+
