@@ -3,15 +3,11 @@ package com.example.finanx.services;
 import com.example.finanx.dto.ExpenseRecord;
 import com.example.finanx.entities.Expense;
 import com.example.finanx.entities.User;
-import com.example.finanx.exception.LimitExceededException;
 import com.example.finanx.exception.ObjectNotFoundException;
 import com.example.finanx.repositories.ExpenseRepository;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.Query;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.Calendar;
 import java.util.List;
 
 @Service
@@ -70,7 +66,7 @@ public class ExpenseService {
      */
 
        public Expense fromDTO(ExpenseRecord objDTO, User user){
-        return new Expense(objDTO.id(), objDTO.amount(), objDTO.name(), objDTO.installmentCount(), objDTO.purchaseDate(),objDTO.description(), objDTO.userId());
+        return new Expense(objDTO.id(), objDTO.name(), objDTO.amount(), objDTO.installmentCount(), objDTO.purchaseDate(),objDTO.description(), objDTO.userId());
     }
 }
     /*

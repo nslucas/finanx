@@ -24,6 +24,7 @@ public class User {
     @JsonManagedReference
     private List<Expense> expenses;
 
+
     public User() {
     }
 
@@ -89,38 +90,15 @@ public class User {
         return password;
     }
 
-    public void setPassword(String password) {
-        this.password = password;
+    public void setPassword(String password){ this.password = password; }
+
+    public List<Expense> getExpenses() {
+        return expenses;
     }
 
-    /*public void addExpense(Expense expense) {
-        if (expenses == null) {
-            expenses = new ArrayList<>();
-        }
-        double totalExpenses = expenses.stream()
-                .filter(e -> isSameMonth(e.getPurchaseDate()))
-                .mapToDouble(Expense::getAmount)
-                .sum();
-
-        if (totalExpenses + expense.getAmount() > monthLimit) {
-            throw new RuntimeException("Limite de despesas atingido para o mês.");
+    public void setExpenses(List<Expense> expenses) {
+        this.expenses = expenses;
     }
 
-     */
-        /*private boolean isSameMonth(Date date) {
-            Calendar currentMonth = Calendar.getInstance();
-            Calendar targetMonth = Calendar.getInstance();
-            targetMonth.setTime(date);
-
-            int currentYear = currentMonth.get(Calendar.YEAR);
-            int currentMonthValue = currentMonth.get(Calendar.MONTH);
-            int targetYear = targetMonth.get(Calendar.YEAR);
-            int targetMonthValue = targetMonth.get(Calendar.MONTH);
-
-            return currentYear == targetYear && currentMonthValue == targetMonthValue;
-        }
-
-         */
-
-    }
+}
 

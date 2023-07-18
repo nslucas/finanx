@@ -1,7 +1,8 @@
 package com.example.finanx.entities;
-import com.example.finanx.dto.UserRecord;
 import jakarta.persistence.*;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -14,16 +15,18 @@ public class Expense {
     private Double amount;
     private String name;
     private Integer installmentCount;
-    private Date purchaseDate;
+    private LocalDateTime purchaseDate;
     private String description;
     private Long userId;
-
+    @ManyToOne
+    @JoinColumn(name = "category_id")
+    private Category category;
     public Expense(){}
 
-    public Expense(String id, Double amount, String name, Integer installmentCount, Date purchaseDate, String description, Long userId) {
+    public Expense(String id, String name, Double amount, Integer installmentCount, LocalDateTime purchaseDate, String description, Long userId) {
         this.id = id;
-        this.amount = amount;
         this.name = name;
+        this.amount = amount;
         this.installmentCount = installmentCount;
         this.purchaseDate = purchaseDate;
         this.description = description;
@@ -62,11 +65,11 @@ public class Expense {
         this.installmentCount = installmentCount;
     }
 
-    public Date getPurchaseDate() {
+    public LocalDateTime getPurchaseDate() {
         return purchaseDate;
     }
 
-    public void setPurchaseDate(Date purchaseDate) {
+    public void setPurchaseDate(LocalDateTime purchaseDate) {
         this.purchaseDate = purchaseDate;
     }
 
