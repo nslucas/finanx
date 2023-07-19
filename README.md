@@ -51,11 +51,15 @@ POST /users - Register a new user.
 
 PUT /users/{userId} - Update an already registered user.
 
+DELETE /users/{userId}
+
 GET /expenses - Retrieve all expenses registered into the API.
 
 GET /expenses/{expenseId} - Retrieve a specific expense by ID.
 
 POST /expenses - Register a new expense.
+
+DELETE /expenses/{expenseId}
 
 ```
 
