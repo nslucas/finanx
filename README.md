@@ -12,6 +12,7 @@ The goal of this API is to help people take control of their financial life. Use
 As someone who has used other finance apps before, I missed some features in the apps, such as: the system should provide a monthly and yearly balance (projection). 
 The user can set a monthly spending limit. The user can add cards by specifying the bank, card network, and card name to avoid using sensitive data. Among other things.
 
+DISCLAIMER: currently the API can only read, update, register, and delete users and expenses, I am currently working to improve the codebase as well as implementing the features mentioned above.  
 ## Table of Contents
 
 - [Installation](#installation)
