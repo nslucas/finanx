@@ -46,48 +46,21 @@ public class ExpenseService {
         //}
     }
 
-
-    /*public double calculateTotalExpenses(User user) {
-        // Obtém o mês atual
-        int currentMonth = Calendar.getInstance().get(Calendar.MONTH) + 1; // Mês atual (lembrando que o mês inicia em 0)
-        int currentYear = Calendar.getInstance().get(Calendar.YEAR); // Ano atual
-
-        // Busca as despesas do usuário no mês atual
-        List<Expense> expenses = expenseRepository.findExpensesByUserAndMonth(user, currentMonth, currentYear);
-
-        // Calcula o total de despesas
-        double totalExpenses = 0.0;
-        for (Expense expense : expenses) {
-            totalExpenses += expense.getAmount();
-        }
-
-        return totalExpenses;
-    }
-     */
-
        public Expense fromDTO(ExpenseRecord objDTO, User user){
         return new Expense(objDTO.id(), objDTO.name(), objDTO.amount(), objDTO.installmentCount(), objDTO.purchaseDate(),objDTO.description(), objDTO.userId());
     }
-}
-    /*
-    public Expense updateExpense(Long id, Expense updatedExpense) {
-        Expense expense = getExpenseById(id);
-        validateExpenseValue(updatedExpense.getAmount(), expense.getUser().getMonthLimit());
 
-        expense.setAmount(updatedExpense.getAmount());
-        expense.setName(updatedExpense.getName());
-        expense.setDescription(updatedExpense.getDescription());
-        expense.setInstallmentCount(updatedExpense.getInstallmentCount());
-        expense.setPurchaseDate(updatedExpense.getPurchaseDate());
-
-        return expenseRepository.save(expense);
-    }
-
-    public void deleteExpense(Long id) {
+    public void delete(String id) {
         expenseRepository.deleteById(id);
     }
 
+}
 
-     */
+
+
+
+
+
+
 
 
