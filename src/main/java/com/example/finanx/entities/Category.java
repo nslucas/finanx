@@ -1,4 +1,4 @@
-package com.example.finanx.entities;
+/*package com.example.finanx.entities;
 
 import jakarta.persistence.*;
 
@@ -27,3 +27,5 @@ public class Category {
         return id;
     }
 }
+
+ */

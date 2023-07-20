@@ -46,12 +46,29 @@ public class ExpenseService {
         //}
     }
 
-       public Expense fromDTO(ExpenseRecord objDTO, User user){
-        return new Expense(objDTO.id(), objDTO.name(), objDTO.amount(), objDTO.installmentCount(), objDTO.purchaseDate(),objDTO.description(), objDTO.userId());
+    /*public Expense update(Expense obj){
+        Expense newObj = expenseRepository.getReferenceById(obj.getId());
+        updateData(newObj, obj);
+        return expenseRepository.save(newObj);
     }
+
+    private void updateData(Expense newObj, Expense obj) {
+        newObj.setName(obj.getName());
+        newObj.setAmount(obj.getAmount());
+        newObj.setInstallmentCount(obj.getInstallmentCount());
+        newObj.setPurchaseDate(obj.getPurchaseDate());
+        newObj.setDescription(obj.getDescription());
+    }
+
+     */
+
 
     public void delete(String id) {
         expenseRepository.deleteById(id);
+    }
+
+    public Expense fromDTO(ExpenseRecord objDTO, User user){
+        return new Expense(objDTO.id(), objDTO.name(), objDTO.amount(), objDTO.installmentCount(), objDTO.purchaseDate(),objDTO.description(), objDTO.userId());
     }
 
 }

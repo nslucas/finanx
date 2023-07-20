@@ -35,15 +35,15 @@ public class ExpenseResource {
     }
 
     /*@PutMapping(value="/{id}")
-    public ResponseEntity<Expense> update(@RequestBody ExpenseRecord objDTO, PathVariable String id){
-        Expense obj =  service.fromDTO(objDTO);
+    public ResponseEntity<Expense> update(@RequestBody ExpenseRecord objDTO, @PathVariable String id){
+        Expense obj = service.fromDTO(objDTO);
         obj.setId(id);
         obj = service.update(obj);
         return ResponseEntity.noContent().build();
 
     }
+    */
 
-     */
     @PostMapping
     public ResponseEntity<String> createExpense(@RequestBody ExpenseRecord objDTO) {
         Expense expense = service.createExpense(objDTO);

@@ -1,6 +1,5 @@
 package com.example.finanx.dto;
 
-import com.example.finanx.entities.Category;
 import com.example.finanx.entities.Expense;
 import com.example.finanx.entities.User;
 
