@@ -73,3 +73,7 @@ The project utilizes [MySQL](https://www.mysql.com/) as the database. The necess
 Contributions are welcome! If you find any issues or have suggestions for improvements, please open an issue or submit a pull request to the repository.
 
 When contributing to this project, please follow the existing code style, [commit conventions](https://www.conventionalcommits.org/en/v1.0.0/), and submit your changes in a separate branch.
+
+## License
+
+This project is licensed under the [MIT License](LICENSE).
