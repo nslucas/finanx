@@ -4,7 +4,7 @@
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
 ![MySQL](https://img.shields.io/badge/mysql-%23316192.svg?style=for-the-badge&logo=mysql&logoColor=white)
 
-This project is an API built using **Java, Java Spring, Flyway Migrations, MySQL as the database, and Spring Security for authentication control.** 
+This project is an API built using **Java, Spring Boot, Flyway Migrations, MySQL as the database, and Spring Security for authentication control.** 
 The API was developed to concretize the knowledge accquired in my 8 months journey of learning Java, and some concepts as well,
 like Oriented Object Programming,Spring Annotations,Databases/SQL, code versioning with Git, and finally API REST. 
 
