@@ -18,10 +18,7 @@ public class Expense {
     private LocalDateTime purchaseDate;
     private String description;
     private Long userId;
-    /*@ManyToOne
-    @JoinColumn(name = "category_id")
-    private Category category;
-     */
+
     public Expense(){}
 
     public Expense(String id, String name, Double amount, Integer installmentCount, LocalDateTime purchaseDate, String description, Long userId) {

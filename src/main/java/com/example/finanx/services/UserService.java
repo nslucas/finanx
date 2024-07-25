@@ -52,7 +52,7 @@ public class UserService {
     }
 
     public User fromDTO(UserRecord objDTO){
-        return new User(objDTO.id(), objDTO.name(), objDTO.lastName(), objDTO.monthLimit(), objDTO.email());
+        return new User(objDTO.name(), objDTO.lastName(), objDTO.monthLimit(), objDTO.email());
     }
 
 }

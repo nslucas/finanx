@@ -46,6 +46,13 @@ public class User {
         this.password = password;
     }
 
+    public User(String name, String lastName, Double monthLimit, String email) {
+        this.name = name;
+        this.lastName = lastName;
+        this.monthLimit = monthLimit;
+        this.email = email;
+    }
+
     public void setId(Long id) {
         this.id = id;
     }
