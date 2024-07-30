@@ -38,3 +38,4 @@ VALUES
         5000.0,
         'eurias123'
     );
+COMMIT;
