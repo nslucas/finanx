@@ -36,7 +36,6 @@ public class User {
         this.email = email;
     }
 
-
     public User(Long id, String name, String lastName, Double monthLimit, String email, String password) {
         this.id = id;
         this.name = name;
