@@ -1,8 +1,8 @@
 CREATE TABLE wallet(
-                      id varchar(255) NOT NULL PRIMARY KEY,
+                      id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
                       owner varchar(255) DEFAULT NULL,
                       balance double DEFAULT NULL,
-                      cards_id varchar(255) DEFAULT NULL,
+                      cards_id INT DEFAULT NULL,
                       user_id bigint DEFAULT NULL,
                       FOREIGN KEY (cards_id) REFERENCES card(id)
                       ON DELETE RESTRICT

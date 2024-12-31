@@ -9,8 +9,8 @@ import java.util.List;
 
 public class Wallet {
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String owner;
     private Double balance;
     @Transient

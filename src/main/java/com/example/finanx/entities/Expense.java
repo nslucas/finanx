@@ -10,8 +10,8 @@ import java.util.Date;
 public class Expense {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private Double amount;
     private String name;
     private Integer installmentCount;
@@ -21,7 +21,7 @@ public class Expense {
 
     public Expense(){}
 
-    public Expense(String id, String name, Double amount, Integer installmentCount, LocalDateTime purchaseDate, String description, Long userId) {
+    public Expense(Integer id, String name, Double amount, Integer installmentCount, LocalDateTime purchaseDate, String description, Long userId) {
         this.id = id;
         this.name = name;
         this.amount = amount;
@@ -31,11 +31,11 @@ public class Expense {
         this.userId = userId;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void String(String id) {
+    public void Integer(Integer id) {
         this.id = id;
     }
 
@@ -79,7 +79,7 @@ public class Expense {
         this.description = description;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

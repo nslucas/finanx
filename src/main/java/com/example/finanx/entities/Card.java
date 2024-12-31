@@ -7,8 +7,8 @@ import jakarta.persistence.*;
 public class Card {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.UUID)
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Integer id;
     private String number;
     private String owner;
     private Double creditLimit;
@@ -19,7 +19,7 @@ public class Card {
     public Card() {
     }
 
-    public Card(String id, String number, String owner, Double creditLimit, Double balance, Long userId) {
+    public Card(Integer id, String number, String owner, Double creditLimit, Double balance, Long userId) {
         this.id = id;
         this.number = number;
         this.owner = owner;
@@ -28,11 +28,11 @@ public class Card {
         this.userId = userId;
     }
 
-    public String getId() {
+    public Integer getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 

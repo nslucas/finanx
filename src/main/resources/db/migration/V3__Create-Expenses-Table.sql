@@ -1,5 +1,5 @@
 CREATE TABLE expense(
-    id varchar(255) NOT NULL PRIMARY KEY,
+    id INT NOT NULL PRIMARY KEY AUTO_INCREMENT,
     name varchar(255) DEFAULT NULL,
     amount double DEFAULT NULL,
     installment_count int DEFAULT NULL,
