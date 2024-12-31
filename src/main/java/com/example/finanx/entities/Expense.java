@@ -17,11 +17,11 @@ public class Expense {
     private Integer installmentCount;
     private LocalDateTime purchaseDate;
     private String description;
-    private Long userId;
+    private Integer userId;
 
     public Expense(){}
 
-    public Expense(Integer id, String name, Double amount, Integer installmentCount, LocalDateTime purchaseDate, String description, Long userId) {
+    public Expense(Integer id, String name, Double amount, Integer installmentCount, LocalDateTime purchaseDate, String description, Integer userId) {
         this.id = id;
         this.name = name;
         this.amount = amount;
@@ -83,11 +83,11 @@ public class Expense {
         this.id = id;
     }
 
-    public void setUserId(Long userId) {
+    public void setUserId(Integer userId) {
         this.userId = userId;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 

@@ -24,7 +24,7 @@ public class UserService {
         return repository.findAll();
     }
 
-    public User findById(Long id) {
+    public User findById(Integer id) {
         Optional<User> optionalUser = repository.findById(id);
         return optionalUser.orElseThrow(() -> new ObjectNotFoundException("Object not found!"));
     }
@@ -33,7 +33,7 @@ public class UserService {
         return repository.save(obj);
     }
 
-    public void delete(Long id){
+    public void delete(Integer id){
         findById(id);
         repository.deleteById(id);
     }

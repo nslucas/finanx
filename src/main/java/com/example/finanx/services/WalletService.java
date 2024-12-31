@@ -24,7 +24,7 @@ public class WalletService {
         return repository.findAll();
     }
 
-    public Wallet findById(Long id) {
+    public Wallet findById(Integer id) {
         Optional<Wallet> optionalWallet = repository.findById(id);
         return optionalWallet.orElseThrow(() -> new ObjectNotFoundException("Object not found!"));
     }
@@ -32,7 +32,7 @@ public class WalletService {
         return repository.save(obj);
     }
 
-    public void delete(Long id){
+    public void delete(Integer id){
         findById(id);
         repository.deleteById(id);
     }

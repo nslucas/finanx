@@ -14,12 +14,12 @@ public class Card {
     private Double creditLimit;
     private Double balance;
 
-    private Long userId;
+    private Integer userId;
 
     public Card() {
     }
 
-    public Card(Integer id, String number, String owner, Double creditLimit, Double balance, Long userId) {
+    public Card(Integer id, String number, String owner, Double creditLimit, Double balance, Integer userId) {
         this.id = id;
         this.number = number;
         this.owner = owner;
@@ -68,7 +68,7 @@ public class Card {
         this.balance = balance;
     }
 
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 }

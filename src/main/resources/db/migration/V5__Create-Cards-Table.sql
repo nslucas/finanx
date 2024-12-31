@@ -4,5 +4,5 @@ CREATE TABLE card(
                       owner varchar(255) DEFAULT NULL,
                       credit_limit float(10) DEFAULT NULL,
                       balance float(10) DEFAULT NULL,
-                      user_id bigint DEFAULT NULL
+                      user_id INT DEFAULT NULL
 );

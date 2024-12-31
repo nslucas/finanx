@@ -3,7 +3,7 @@ CREATE TABLE wallet(
                       owner varchar(255) DEFAULT NULL,
                       balance double DEFAULT NULL,
                       cards_id INT DEFAULT NULL,
-                      user_id bigint DEFAULT NULL,
+                      user_id INT DEFAULT NULL,
                       FOREIGN KEY (cards_id) REFERENCES card(id)
                       ON DELETE RESTRICT
                       ON UPDATE RESTRICT,

@@ -15,9 +15,9 @@ public class Wallet {
     private Double balance;
     @Transient
     private List<Card> cards;
-    private Long userId;
+    private Integer userId;
     
-    public Wallet(String owner, Double balance, List<Card> cards, Long userId) {
+    public Wallet(String owner, Double balance, List<Card> cards, Integer userId) {
         this.owner = owner;
         this.balance = balance;
         this.cards = cards;
@@ -47,7 +47,7 @@ public class Wallet {
     public void setCards(List<Card> cards) {
         this.cards = cards;
     }
-    public Long getUserId() {
+    public Integer getUserId() {
         return userId;
     }
 
@@ -71,7 +71,7 @@ public class Wallet {
         }
     }
 
-    public Long getId() {
+    public Integer getId() {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getId'");
     }

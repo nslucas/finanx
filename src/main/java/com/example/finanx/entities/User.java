@@ -14,7 +14,7 @@ import java.util.List;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Integer id;
     private String name;
     private String lastName;
     private Double monthLimit;
@@ -28,7 +28,7 @@ public class User {
     public User() {
     }
 
-    public User(Long id, String name, String lastName, Double monthLimit, String email) {
+    public User(Integer id, String name, String lastName, Double monthLimit, String email) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -36,7 +36,7 @@ public class User {
         this.email = email;
     }
 
-    public User(Long id, String name, String lastName, Double monthLimit, String email, String password) {
+    public User(Integer id, String name, String lastName, Double monthLimit, String email, String password) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -52,11 +52,11 @@ public class User {
         this.email = email;
     }
 
-    public void setId(Long id) {
+    public void setId(Integer id) {
         this.id = id;
     }
 
-    public Long getId() {
+    public Integer getId() {
         return id;
     }
 
