@@ -38,7 +38,16 @@ public class ExpenseService {
         double sumAmountByUser = expenseRepository.sumAmountByUserId(userId);
         User user = userService.findById(userId);
         if (sumAmountByUser >= user.getMonthLimit()) {
-            return "Your month limit exceeded, here's your total for this month" + sumAmountByUser;
+            return "Your month limit exceeded, here's your total for this month " + sumAmountByUser;
+        }
+        return Double.toString(sumAmountByUser);
+    }
+
+    public String getSumAmountByUserIdInCurrentMonth(Integer userId) {
+        double sumAmountByUser = expenseRepository.sumAmountByUserIdInCurrentMonth(userId);
+        User user = userService.findById(userId);
+        if (sumAmountByUser >= user.getMonthLimit()) {
+            return "Your month limit exceeded, here's your total for this month " + sumAmountByUser;
         }
         return Double.toString(sumAmountByUser);
     }
@@ -63,6 +72,10 @@ public class ExpenseService {
 
     public Double getTotalExpensesByUserId(Integer userId) {
         return expenseRepository.sumAmountByUserId(userId);
+    }
+
+    public Double getTotalExpensesByUserIdInCurrentMonth(Integer userId) {
+        return expenseRepository.sumAmountByUserIdInCurrentMonth(userId);
     }
 
     public Expense fromDTO(ExpenseRecord objDTO){

@@ -30,9 +30,15 @@ public class ExpenseResource {
         return ResponseEntity.ok().body(expenseRecord);
     }
 
-    @GetMapping(value="/{id}/get")
+    @GetMapping(value="/{id}/total-expenses")
     public ResponseEntity<Double> getTotalExpenses(@PathVariable Integer id){
         double retrieveTotalExpenses = service.getTotalExpensesByUserId(id);
+        return ResponseEntity.ok().body(retrieveTotalExpenses);
+    }
+
+    @GetMapping(value="/{id}/total-expenses/current-month")
+    public ResponseEntity<Double> getTotalExpensesInCurrentMonth(@PathVariable Integer id){
+        double retrieveTotalExpenses = service.getTotalExpensesByUserIdInCurrentMonth(id);
         return ResponseEntity.ok().body(retrieveTotalExpenses);
     }
 
