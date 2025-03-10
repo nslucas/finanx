@@ -1,4 +1,4 @@
-package com.example.finanx.services;
+package com.example.finanx.Services;
 
 import java.util.List;
 import java.util.Optional;
@@ -6,10 +6,10 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.example.finanx.dto.WalletRecord;
-import com.example.finanx.entities.Wallet;
-import com.example.finanx.exception.ObjectNotFoundException;
-import com.example.finanx.repositories.WalletRepository;
+import com.example.finanx.DTO.WalletRecord;
+import com.example.finanx.Entities.Wallet;
+import com.example.finanx.Exceptions.ObjectNotFoundException;
+import com.example.finanx.Repositories.WalletRepository;
 
 @Service
 public class WalletService {

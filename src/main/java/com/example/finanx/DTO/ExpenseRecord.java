@@ -1,10 +1,8 @@
-package com.example.finanx.dto;
+package com.example.finanx.DTO;
 
-import com.example.finanx.entities.Expense;
-import com.example.finanx.entities.User;
-import java.time.Instant;
+import com.example.finanx.Entities.Expense;
+
 import java.time.LocalDateTime;
-import java.util.Date;
 
 public record ExpenseRecord(Integer id, String name, Double amount, Integer installmentCount, LocalDateTime purchaseDate, String description, Integer userId) {
 

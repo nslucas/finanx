@@ -1,4 +1,4 @@
-package com.example.finanx.exception;
+package com.example.finanx.Exceptions;
 
 import java.io.Serializable;
 

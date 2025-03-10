@@ -1,9 +1,7 @@
-package com.example.finanx.services;
+package com.example.finanx.Services;
 
-import com.example.finanx.repositories.CardRepository;
+import com.example.finanx.Repositories.CardRepository;
 import org.springframework.stereotype.Service;
-
-import java.util.List;
 
 @Service
 public class CardService {

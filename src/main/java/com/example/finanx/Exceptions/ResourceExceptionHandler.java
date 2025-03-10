@@ -1,4 +1,4 @@
-package com.example.finanx.exception;
+package com.example.finanx.Exceptions;
 
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.http.HttpStatus;

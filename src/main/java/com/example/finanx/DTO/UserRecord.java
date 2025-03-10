@@ -1,7 +1,6 @@
-package com.example.finanx.dto;
+package com.example.finanx.DTO;
 
-import com.example.finanx.entities.User;
-import com.example.finanx.resources.UserResource;
+import com.example.finanx.Entities.User;
 
 public record UserRecord(String name, String lastName, Double monthLimit, String email) {
 

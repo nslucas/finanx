@@ -1,8 +1,8 @@
-package com.example.finanx.resources;
+package com.example.finanx.Resources;
 
-import com.example.finanx.dto.UserRecord;
-import com.example.finanx.entities.User;
-import com.example.finanx.services.UserService;
+import com.example.finanx.DTO.UserRecord;
+import com.example.finanx.Entities.User;
+import com.example.finanx.Services.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -10,7 +10,6 @@ import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.net.URI;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/users")

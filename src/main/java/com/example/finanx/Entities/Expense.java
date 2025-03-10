@@ -1,9 +1,7 @@
-package com.example.finanx.entities;
+package com.example.finanx.Entities;
 import jakarta.persistence.*;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
-import java.util.Date;
 
 @Entity
 @Table(name="expense")

@@ -1,4 +1,4 @@
-package com.example.finanx.entities;
+package com.example.finanx.Entities;
 
 import jakarta.persistence.*;
 

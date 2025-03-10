@@ -1,17 +1,14 @@
-package com.example.finanx.repositories;
+package com.example.finanx.Repositories;
 
-import com.example.finanx.entities.Expense;
-import com.example.finanx.entities.User;
+import com.example.finanx.Entities.Expense;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
-
-import java.math.BigDecimal;
-import java.time.LocalDate;
-import java.util.List;
+import org.springframework.data.repository.query.Param;
 
 @Repository
-public interface ExpenseRepository extends JpaRepository<Expense, String> {
-
+public interface ExpenseRepository extends JpaRepository<Expense, Integer> {
+    @Query("SELECT COALESCE(SUM(e.amount), 0.0) FROM Expense e WHERE e.userId = :userId")
+    Double sumAmountByUserId(@Param("userId") Integer userId);
 }
 

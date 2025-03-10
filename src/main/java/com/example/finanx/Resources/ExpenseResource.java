@@ -1,12 +1,8 @@
-package com.example.finanx.resources;
+package com.example.finanx.Resources;
 
-import com.example.finanx.dto.ExpenseRecord;
-import com.example.finanx.dto.UserRecord;
-import com.example.finanx.entities.Expense;
-import com.example.finanx.entities.User;
-import com.example.finanx.exception.ObjectNotFoundException;
-import com.example.finanx.services.ExpenseService;
-import com.example.finanx.services.UserService;
+import com.example.finanx.DTO.ExpenseRecord;
+import com.example.finanx.Entities.Expense;
+import com.example.finanx.Services.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -27,31 +23,37 @@ public class ExpenseResource {
     }
 
     @GetMapping(value="/{id}")
-    public ResponseEntity<ExpenseRecord> findById(@PathVariable String id){
+    public ResponseEntity<ExpenseRecord> findById(@PathVariable Integer id){
         Expense obj = service.getExpenseById(id);
         ExpenseRecord expenseRecord = new ExpenseRecord(obj.getId(),  obj.getName(), obj.getAmount(),
                 obj.getInstallmentCount(), obj.getPurchaseDate(), obj.getDescription(), obj.getUserId());
         return ResponseEntity.ok().body(expenseRecord);
     }
 
-    /*@PutMapping(value="/{id}")
-    public ResponseEntity<Expense> update(@RequestBody ExpenseRecord objDTO, @PathVariable String id){
+    @GetMapping(value="/{id}/get")
+    public ResponseEntity<Double> getTotalExpenses(@PathVariable Integer id){
+        double retrieveTotalExpenses = service.getTotalExpensesByUserId(id);
+        return ResponseEntity.ok().body(retrieveTotalExpenses);
+    }
+
+    @PutMapping(value="/{id}")
+    public ResponseEntity<Expense> update(@RequestBody ExpenseRecord objDTO, @PathVariable Integer id){
         Expense obj = service.fromDTO(objDTO);
         obj.setId(id);
         obj = service.update(obj);
         return ResponseEntity.noContent().build();
-
     }
-    */
+
 
     @PostMapping
     public ResponseEntity<String> createExpense(@RequestBody ExpenseRecord objDTO) {
         Expense expense = service.createExpense(objDTO);
+
         return ResponseEntity.ok("Expense created successfully.");
     }
 
     @DeleteMapping(value="/{id}")
-    public ResponseEntity<Void> delete(@PathVariable String id) {
+    public ResponseEntity<Void> delete(@PathVariable Integer id) {
         service.delete(id);
         return ResponseEntity.noContent().build();
     }
