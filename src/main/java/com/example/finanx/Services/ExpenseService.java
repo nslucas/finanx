@@ -78,6 +78,22 @@ public class ExpenseService {
         return expenseRepository.sumAmountByUserIdInCurrentMonth(userId);
     }
 
+    public Double getTotalExpensesByUserIdInAnyMonth(Integer userId, Integer month, Integer year) {
+        return expenseRepository.sumAmountByUserIdInAnyMonth(userId, month, year);
+    }
+
+    public List<Expense> getExpensesByUserIdInCurrentMonth(Integer userId) {
+        return expenseRepository.findExpensesByUserIdAndPurchaseDateInCurrentMonth(userId);
+    }
+
+    public List<Expense> getExpensesByUserIdInAnyMonth(Integer userId, Integer month, Integer year){
+        List<Expense> list = expenseRepository.findExpensesByUserIdAndPurchaseDateInAnyMonth(userId, month, year);
+        if (list.isEmpty()) {
+            throw new ObjectNotFoundException("There are no expenses for this user");
+        }
+        return list;
+    }
+
     public Expense fromDTO(ExpenseRecord objDTO){
         return new Expense(objDTO.id(), objDTO.name(), objDTO.amount(), objDTO.installmentCount(), objDTO.purchaseDate(),objDTO.description(), objDTO.userId());
     }

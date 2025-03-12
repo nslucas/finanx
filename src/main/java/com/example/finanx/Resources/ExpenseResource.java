@@ -2,12 +2,16 @@ package com.example.finanx.Resources;
 
 import com.example.finanx.DTO.ExpenseRecord;
 import com.example.finanx.Entities.Expense;
+import com.example.finanx.Entities.MonthlyExpensesResponse;
 import com.example.finanx.Services.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.Year;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/expenses")
@@ -37,9 +41,26 @@ public class ExpenseResource {
     }
 
     @GetMapping(value="/{id}/total-expenses/current-month")
-    public ResponseEntity<Double> getTotalExpensesInCurrentMonth(@PathVariable Integer id){
-        double retrieveTotalExpenses = service.getTotalExpensesByUserIdInCurrentMonth(id);
-        return ResponseEntity.ok().body(retrieveTotalExpenses);
+    public ResponseEntity<MonthlyExpensesResponse> getTotalExpensesInCurrentMonth(@PathVariable Integer id){
+        List<Expense> expenses = service.getExpensesByUserIdInCurrentMonth(id);
+        double totalAmount = service.getTotalExpensesByUserIdInCurrentMonth(id);
+        MonthlyExpensesResponse response = new MonthlyExpensesResponse(expenses, totalAmount);
+        return ResponseEntity.ok().body(response);
+    }
+
+    @GetMapping(value="/{id}/total-expenses/any-month")
+    public ResponseEntity<MonthlyExpensesResponse> getTotalExpensesInAnyMonth(@PathVariable Integer id, @RequestParam Integer month, @RequestParam Integer year){
+        if (month < 1 || month > 12) {
+            throw new IllegalArgumentException("Month must be between 1 and 12.");
+        }
+        if (year > Year.now().getValue()) {
+            throw new IllegalArgumentException("Year must be a valid year.");
+        }
+
+        List<Expense> expenses = service.getExpensesByUserIdInAnyMonth(id, month, year);
+        double totalAmount = service.getTotalExpensesByUserIdInAnyMonth(id, month, year);
+        MonthlyExpensesResponse response = new MonthlyExpensesResponse(expenses, totalAmount);
+        return ResponseEntity.ok().body(response);
     }
 
     @PutMapping(value="/{id}")
