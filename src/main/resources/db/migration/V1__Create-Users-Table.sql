@@ -4,5 +4,6 @@ CREATE TABLE user(
     last_name varchar(255) DEFAULT NULL,
     email varchar(255) DEFAULT NULL,
     month_limit double DEFAULT NULL,
-    password varchar(255) DEFAULT NULL
+    password varchar(255) DEFAULT NULL,
+    role varchar(100) NOT NULL DEFAULT 'user'
 );

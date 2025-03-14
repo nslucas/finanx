@@ -29,10 +29,6 @@ public class UserService {
         return optionalUser.orElseThrow(() -> new ObjectNotFoundException("Object not found!"));
     }
 
-    public User insert(User obj) {
-        return repository.save(obj);
-    }
-
     public void delete(Integer id){
         findById(id);
         repository.deleteById(id);
