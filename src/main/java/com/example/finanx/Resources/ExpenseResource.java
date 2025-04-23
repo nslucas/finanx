@@ -40,6 +40,11 @@ public class ExpenseResource {
         return ResponseEntity.ok().body(retrieveTotalExpenses);
     }
 
+
+    /*
+    TODO:
+    Make this method return the sum of expense_installments for current_month
+     */
     @GetMapping(value="/{id}/total-expenses/current-month")
     public ResponseEntity<MonthlyExpensesResponse> getTotalExpensesInCurrentMonth(@PathVariable Integer id){
         List<Expense> expenses = service.getExpensesByUserIdInCurrentMonth(id);
@@ -48,6 +53,10 @@ public class ExpenseResource {
         return ResponseEntity.ok().body(response);
     }
 
+    /*
+    TODO:
+    Make this method return the sum of expense_installments for the due month
+     */
     @GetMapping(value="/{id}/total-expenses/any-month")
     public ResponseEntity<MonthlyExpensesResponse> getTotalExpensesInAnyMonth(@PathVariable Integer id, @RequestParam Integer month, @RequestParam Integer year){
         if (month < 1 || month > 12) {

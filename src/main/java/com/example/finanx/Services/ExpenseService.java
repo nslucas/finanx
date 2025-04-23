@@ -6,6 +6,7 @@ import com.example.finanx.Entities.User;
 import com.example.finanx.Exceptions.LimitExceededException;
 import com.example.finanx.Exceptions.ObjectNotFoundException;
 import com.example.finanx.Repositories.ExpenseRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
@@ -15,15 +16,18 @@ import java.time.ZoneId;
 import java.util.List;
 
 @Service
+@Transactional
 public class ExpenseService {
     private final ExpenseRepository expenseRepository;
     private final UserService userService;
     private final String TIME_ZONE = "America/Sao_Paulo";
+    private final ExpenseInstallmentService installmentService;
 
     @Autowired
-    public ExpenseService(ExpenseRepository expenseRepository, UserService userService) {
+    public ExpenseService(ExpenseRepository expenseRepository, UserService userService, ExpenseInstallmentService installmentService) {
         this.expenseRepository = expenseRepository;
         this.userService = userService;
+        this.installmentService = installmentService;
     }
 
 
@@ -62,7 +66,9 @@ public class ExpenseService {
             LocalDateTime currentDateTime = LocalDateTime.now(zid);
             expense.setPurchaseDate(currentDateTime);
         }
-        return expenseRepository.save(expense);
+        expenseRepository.save(expense);
+        installmentService.generateInstallments(expense);
+        return(expense);
     }
 
     public Expense update(Expense obj){
