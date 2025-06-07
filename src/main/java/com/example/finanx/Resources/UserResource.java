@@ -18,6 +18,9 @@ public class UserResource {
     @Autowired
     private UserService service;
 
+    /*
+    TO-DO: Make the method below return a custom message to the user explaining why not authorized.
+     */
     @GetMapping
     public ResponseEntity<List<UserRecord>> findAll(){
         List<UserRecord> list = service.findAll().stream().map(UserRecord::new).toList();

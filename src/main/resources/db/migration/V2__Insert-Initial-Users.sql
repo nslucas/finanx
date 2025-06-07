@@ -4,10 +4,10 @@ VALUES
     (
         'Lucas',
         'Nunes Santos',
-        'lucas@teste.com.br',
+        'lucasn.nunes066@gmail.com',
         3000.0,
-        'tiks123',
-        'admin'
+        '$2a$10$zDSzSIrBhhIIvrmYl4VB5u4kIn/AaNMQlEc4ea63ytqquPiq2aGKS',
+        'ADMIN'
     );
 INSERT INTO
     user(name, last_name, email, month_limit, password, role)
@@ -15,10 +15,10 @@ VALUES
     (
         'Arthur',
         'Nunes Santos',
-        'tatiana@teste.com.br',
+        'arthur@gmail.com',
         2000.0,
-        'arthur123',
-        'user'
+        '$2a$10$zDSzSIrBhhIIvrmYl4VB5u4kIn/AaNMQlEc4ea63ytqquPiq2aGKS',
+        'USER'
     );
 INSERT INTO
     user(name, last_name, email, month_limit, password, role)
@@ -26,10 +26,10 @@ VALUES
     (
         'Tatiana',
         'Nunes Santos',
-        'eurias@teste.com.br',
+        'tatiana@gmail.com',
         1000.0,
-        'tatiana123',
-        'user'
+        '$2a$10$zDSzSIrBhhIIvrmYl4VB5u4kIn/AaNMQlEc4ea63ytqquPiq2aGKS',
+        'USER'
     );
 INSERT INTO
     user(name, last_name, email, month_limit, password, role)
@@ -37,10 +37,10 @@ VALUES
     (
         'Eurias',
         'Aparecido Amorim dos Santos',
-        'eurias@teste.com.br',
+        'eurias@gmail.com',
         5000.0,
-        'eurias123',
-        'user'
+        '$2a$10$zDSzSIrBhhIIvrmYl4VB5u4kIn/AaNMQlEc4ea63ytqquPiq2aGKS',
+        'USER'
 
     );
 COMMIT;

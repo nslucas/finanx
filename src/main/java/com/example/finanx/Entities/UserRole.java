@@ -1,5 +1,8 @@
 package com.example.finanx.Entities;
 
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
+
 public enum UserRole {
     ADMIN("admin"),
     USER("user");

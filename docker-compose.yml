@@ -1,0 +1,34 @@
+version: '3.8'
+
+services:
+  finanx-app:
+    build: .
+    ports:
+      - "8080:8080"
+      - "5005:5005"
+    depends_on:
+      - finanx-db
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:mysql://finanx-db:3306/finanx_db?createDatabaseIfNotExist=true
+      - SPRING_DATASOURCE_USERNAME=finanx_user
+      - SPRING_DATASOURCE_PASSWORD=finanx_pass
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_PROFILES_ACTIVE=dev
+      - JAVA_TOOL_OPTIONS=-agentlib:jdwp=transport=dt_socket,server=y,suspend=n,address=*:5005
+    restart: unless-stopped
+
+  finanx-db:
+    image: mysql:8.0
+    environment:
+      - MYSQL_DATABASE=finanx_db
+      - MYSQL_USER=finanx_user
+      - MYSQL_PASSWORD=finanx_pass
+      - MYSQL_ROOT_PASSWORD=rootpass
+    ports:
+      - "3306:3306"
+    volumes:
+      - finanx_db_data:/var/lib/mysql
+    restart: unless-stopped
+
+volumes:
+  finanx_db_data:

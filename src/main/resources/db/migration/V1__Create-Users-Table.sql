@@ -5,5 +5,5 @@ CREATE TABLE user(
     email varchar(255) DEFAULT NULL,
     month_limit double DEFAULT NULL,
     password varchar(255) DEFAULT NULL,
-    role varchar(100) NOT NULL DEFAULT 'user'
+    role varchar(100) NOT NULL DEFAULT 'USER'
 );
