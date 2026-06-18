@@ -7,11 +7,12 @@ import com.example.finanx.Services.ExpenseService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import java.math.BigDecimal;
+import java.net.URI;
 import java.time.Year;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/expenses")
@@ -21,42 +22,36 @@ public class ExpenseResource {
     private ExpenseService service;
 
     @GetMapping
-    public ResponseEntity<List<ExpenseRecord>> findAll(){
-        List<ExpenseRecord> list = service.getAllExpenses().stream().map(ExpenseRecord::new).toList();
+    public ResponseEntity<List<ExpenseRecord>> findAll(@RequestParam(required = false) Integer month,
+                                                       @RequestParam(required = false) Integer year,
+                                                       @RequestParam(required = false) Integer cardId){
+        List<ExpenseRecord> list = service.findAuthenticatedUserExpenses(month, year, cardId).stream()
+                .map(ExpenseRecord::new)
+                .toList();
         return ResponseEntity.ok().body(list);
     }
 
     @GetMapping(value="/{id}")
     public ResponseEntity<ExpenseRecord> findById(@PathVariable Integer id){
-        Expense obj = service.getExpenseById(id);
+        Expense obj = service.getAuthenticatedUserExpense(id);
         ExpenseRecord expenseRecord = new ExpenseRecord(obj.getId(),  obj.getName(), obj.getAmount(),
-                obj.getInstallmentCount(), obj.getPurchaseDate(), obj.getDescription(), obj.getUserId());
+                obj.getInstallmentCount(), obj.getPurchaseDate(), obj.getDescription(), obj.getUserId(), obj.getCardId());
         return ResponseEntity.ok().body(expenseRecord);
     }
 
     @GetMapping(value="/{id}/total-expenses")
-    public ResponseEntity<Double> getTotalExpenses(@PathVariable Integer id){
-        double retrieveTotalExpenses = service.getTotalExpensesByUserId(id);
+    public ResponseEntity<BigDecimal> getTotalExpenses(@PathVariable Integer id){
+        BigDecimal retrieveTotalExpenses = service.getTotalExpensesByUserId(id);
         return ResponseEntity.ok().body(retrieveTotalExpenses);
     }
 
-
-    /*
-    TODO:
-    Make this method return the sum of expense_installments for current_month
-     */
     @GetMapping(value="/{id}/total-expenses/current-month")
     public ResponseEntity<MonthlyExpensesResponse> getTotalExpensesInCurrentMonth(@PathVariable Integer id){
         List<Expense> expenses = service.getExpensesByUserIdInCurrentMonth(id);
-        double totalAmount = service.getTotalExpensesByUserIdInCurrentMonth(id);
+        BigDecimal totalAmount = service.getTotalExpensesByUserIdInCurrentMonth(id);
         MonthlyExpensesResponse response = new MonthlyExpensesResponse(expenses, totalAmount);
         return ResponseEntity.ok().body(response);
     }
-
-    /*
-    TODO:
-    Make this method return the sum of expense_installments for the due month
-     */
     @GetMapping(value="/{id}/total-expenses/any-month")
     public ResponseEntity<MonthlyExpensesResponse> getTotalExpensesInAnyMonth(@PathVariable Integer id, @RequestParam Integer month, @RequestParam Integer year){
         if (month < 1 || month > 12) {
@@ -67,25 +62,26 @@ public class ExpenseResource {
         }
 
         List<Expense> expenses = service.getExpensesByUserIdInAnyMonth(id, month, year);
-        double totalAmount = service.getTotalExpensesByUserIdInAnyMonth(id, month, year);
+        BigDecimal totalAmount = service.getTotalExpensesByUserIdInAnyMonth(id, month, year);
         MonthlyExpensesResponse response = new MonthlyExpensesResponse(expenses, totalAmount);
         return ResponseEntity.ok().body(response);
     }
 
     @PutMapping(value="/{id}")
-    public ResponseEntity<Expense> update(@RequestBody ExpenseRecord objDTO, @PathVariable Integer id){
-        Expense obj = service.fromDTO(objDTO);
-        obj.setId(id);
-        obj = service.update(obj);
-        return ResponseEntity.noContent().build();
+    public ResponseEntity<ExpenseRecord> update(@RequestBody ExpenseRecord objDTO, @PathVariable Integer id){
+        Expense obj = service.update(id, objDTO);
+        return ResponseEntity.ok(new ExpenseRecord(obj));
     }
 
 
     @PostMapping
-    public ResponseEntity<String> createExpense(@RequestBody ExpenseRecord objDTO) {
+    public ResponseEntity<ExpenseRecord> createExpense(@RequestBody ExpenseRecord objDTO) {
         Expense expense = service.createExpense(objDTO);
-
-        return ResponseEntity.ok("Expense created successfully.");
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{id}")
+                .buildAndExpand(expense.getId())
+                .toUri();
+        return ResponseEntity.created(uri).body(new ExpenseRecord(expense));
     }
 
     @DeleteMapping(value="/{id}")

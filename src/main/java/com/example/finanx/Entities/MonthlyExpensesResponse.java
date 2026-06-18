@@ -1,12 +1,13 @@
 package com.example.finanx.Entities;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 public class MonthlyExpensesResponse {
     private List<Expense> expenses;
-    private double totalAmount;
+    private BigDecimal totalAmount;
 
-    public MonthlyExpensesResponse(List<Expense> expenses, double totalAmount) {
+    public MonthlyExpensesResponse(List<Expense> expenses, BigDecimal totalAmount) {
         this.expenses = expenses;
         this.totalAmount = totalAmount;
     }
@@ -19,11 +20,11 @@ public class MonthlyExpensesResponse {
         this.expenses = expenses;
     }
 
-    public double getTotalAmount() {
+    public BigDecimal getTotalAmount() {
         return totalAmount;
     }
 
-    public void setTotalAmount(double totalAmount) {
+    public void setTotalAmount(BigDecimal totalAmount) {
         this.totalAmount = totalAmount;
     }
 }

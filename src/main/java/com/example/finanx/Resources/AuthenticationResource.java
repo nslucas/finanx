@@ -4,6 +4,7 @@ import com.example.finanx.DTO.AuthenticationDTO;
 import com.example.finanx.DTO.LoginResponseDTO;
 import com.example.finanx.DTO.RegisterDTO;
 import com.example.finanx.Entities.User;
+import com.example.finanx.Entities.UserRole;
 import com.example.finanx.Infra.Security.TokenService;
 import com.example.finanx.Repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,7 +54,8 @@ public class AuthenticationResource {
             return ResponseEntity.badRequest().build();
         }
         String encryptedPassword = BCrypt.hashpw(data.password(), BCrypt.gensalt());
-        User newUser = new User(data.name(), data.lastName(), data.monthLimit(), data.email(), encryptedPassword, data.role());
+        UserRole role = data.role() == null ? UserRole.USER : data.role();
+        User newUser = new User(data.name(), data.lastName(), data.monthLimit(), data.email(), encryptedPassword, role);
 
         this._repository.save(newUser);
 

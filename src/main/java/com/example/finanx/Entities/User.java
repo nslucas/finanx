@@ -1,11 +1,11 @@
 package com.example.finanx.Entities;
 
-import com.fasterxml.jackson.annotation.JsonManagedReference;
 import jakarta.persistence.*;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
+import java.math.BigDecimal;
 import java.util.Collection;
 import java.util.List;
 
@@ -17,20 +17,19 @@ public class User implements UserDetails {
     private Integer id;
     private String name;
     private String lastName;
-    private Double monthLimit;
+    private BigDecimal monthLimit;
     private String email;
     private String password;
     @Enumerated(EnumType.STRING)
     private UserRole role;
-    @OneToMany(mappedBy = "userId")
-    @JsonManagedReference
+    @Transient
     private List<Expense> expenses;
 
 
     public User() {
     }
 
-    public User(String name, String lastName, Double monthLimit, String email) {
+    public User(String name, String lastName, BigDecimal monthLimit, String email) {
         this.name = name;
         this.lastName = lastName;
         this.monthLimit = monthLimit;
@@ -38,7 +37,7 @@ public class User implements UserDetails {
     }
 
 
-    public User(Integer id, String name, String lastName, Double monthLimit, String email) {
+    public User(Integer id, String name, String lastName, BigDecimal monthLimit, String email) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -46,7 +45,7 @@ public class User implements UserDetails {
         this.email = email;
     }
 
-    public User(Integer id, String name, String lastName, Double monthLimit, String email, String password) {
+    public User(Integer id, String name, String lastName, BigDecimal monthLimit, String email, String password) {
         this.id = id;
         this.name = name;
         this.lastName = lastName;
@@ -55,7 +54,7 @@ public class User implements UserDetails {
         this.password = password;
     }
 
-    public User(String name, String lastName, Double monthLimit, String email, String password, UserRole role) {
+    public User(String name, String lastName, BigDecimal monthLimit, String email, String password, UserRole role) {
         this.name = name;
         this.lastName = lastName;
         this.monthLimit = monthLimit;
@@ -89,11 +88,11 @@ public class User implements UserDetails {
         this.lastName = lastName;
     }
 
-    public Double getMonthLimit() {
+    public BigDecimal getMonthLimit() {
         return monthLimit;
     }
 
-    public void setMonthLimit(Double monthLimit) {
+    public void setMonthLimit(BigDecimal monthLimit) {
         this.monthLimit = monthLimit;
     }
 

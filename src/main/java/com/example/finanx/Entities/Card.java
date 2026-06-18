@@ -2,6 +2,8 @@ package com.example.finanx.Entities;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
+
 @Entity
 @Table(name= "card")
 public class Card {
@@ -9,22 +11,30 @@ public class Card {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private String number;
-    private String owner;
-    private Double creditLimit;
-    private Double balance;
-
+    private String bankName;
+    private String name;
+    private String network;
+    private String lastFourDigits;
+    private BigDecimal creditLimit;
+    private Integer closingDay;
+    private Integer dueDay;
+    private Boolean active = true;
     private Integer userId;
 
     public Card() {
     }
 
-    public Card(Integer id, String number, String owner, Double creditLimit, Double balance, Integer userId) {
+    public Card(Integer id, String bankName, String name, String network, String lastFourDigits,
+                BigDecimal creditLimit, Integer closingDay, Integer dueDay, Boolean active, Integer userId) {
         this.id = id;
-        this.number = number;
-        this.owner = owner;
+        this.bankName = bankName;
+        this.name = name;
+        this.network = network;
+        this.lastFourDigits = lastFourDigits;
         this.creditLimit = creditLimit;
-        this.balance = balance;
+        this.closingDay = closingDay;
+        this.dueDay = dueDay;
+        this.active = active == null || active;
         this.userId = userId;
     }
 
@@ -36,39 +46,75 @@ public class Card {
         this.id = id;
     }
 
-    public String getNumber() {
-        return number;
+    public String getBankName() {
+        return bankName;
     }
 
-    public void setNumber(String number) {
-        this.number = number;
+    public void setBankName(String bankName) {
+        this.bankName = bankName;
     }
 
-    public String getOwner() {
-        return owner;
+    public String getName() {
+        return name;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
+    public void setName(String name) {
+        this.name = name;
     }
 
-    public Double getCreditLimit() {
+    public String getNetwork() {
+        return network;
+    }
+
+    public void setNetwork(String network) {
+        this.network = network;
+    }
+
+    public String getLastFourDigits() {
+        return lastFourDigits;
+    }
+
+    public void setLastFourDigits(String lastFourDigits) {
+        this.lastFourDigits = lastFourDigits;
+    }
+
+    public BigDecimal getCreditLimit() {
         return creditLimit;
     }
 
-    public void setCreditLimit(Double creditLimit) {
+    public void setCreditLimit(BigDecimal creditLimit) {
         this.creditLimit = creditLimit;
     }
 
-    public Double getBalance() {
-        return balance;
+    public Integer getClosingDay() {
+        return closingDay;
     }
 
-    public void setBalance(Double balance) {
-        this.balance = balance;
+    public void setClosingDay(Integer closingDay) {
+        this.closingDay = closingDay;
+    }
+
+    public Integer getDueDay() {
+        return dueDay;
+    }
+
+    public void setDueDay(Integer dueDay) {
+        this.dueDay = dueDay;
+    }
+
+    public Boolean getActive() {
+        return active;
+    }
+
+    public void setActive(Boolean active) {
+        this.active = active;
     }
 
     public Integer getUserId() {
         return userId;
+    }
+
+    public void setUserId(Integer userId) {
+        this.userId = userId;
     }
 }

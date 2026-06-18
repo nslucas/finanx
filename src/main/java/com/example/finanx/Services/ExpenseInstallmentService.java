@@ -1,11 +1,14 @@
 package com.example.finanx.Services;
 
+import com.example.finanx.Entities.Card;
 import com.example.finanx.Entities.Expense;
 import com.example.finanx.Entities.ExpenseInstallment;
 import com.example.finanx.Repositories.ExpenseInstallmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -19,19 +22,21 @@ public class ExpenseInstallmentService {
         this.installmentRepository = installmentRepository;
     }
 
-    public void generateInstallments(Expense expense) {
+    public void generateInstallments(Expense expense, Card card) {
         List<ExpenseInstallment> installments = new ArrayList<>();
-        double totalAmount = expense.getAmount();
+        BigDecimal totalAmount = expense.getAmount();
         int installmentCount = expense.getInstallmentCount();
-        LocalDate firstDueDate = LocalDate.from(expense.getPurchaseDate()); // Certifique-se que este método existe na Expense
+        LocalDate purchaseDate = LocalDate.from(expense.getPurchaseDate());
+        LocalDate firstDueDate = card == null
+                ? purchaseDate
+                : CardBillingCycleCalculator.firstDueDate(card, purchaseDate);
 
-        double installmentAmount = totalAmount / installmentCount;
-        installmentAmount = Math.round(installmentAmount * 100.0) / 100.0;
+        BigDecimal installmentAmount = totalAmount.divide(BigDecimal.valueOf(installmentCount), 2, RoundingMode.HALF_UP);
 
         for (int i = 0; i < installmentCount; i++) {
             ExpenseInstallment installment = new ExpenseInstallment(
-                    expense.getId(), // expenseId
-                    i + 1,         // installmentNumber
+                    expense.getId(),
+                    i + 1,
                     installmentAmount,
                     firstDueDate.plusMonths(i)
             );
@@ -40,5 +45,9 @@ public class ExpenseInstallmentService {
         }
 
         installmentRepository.saveAll(installments);
+    }
+
+    public void deleteByExpenseId(Integer expenseId) {
+        installmentRepository.deleteById_ExpenseId(expenseId);
     }
 }

@@ -3,5 +3,11 @@ package com.example.finanx.Repositories;
 import com.example.finanx.Entities.Card;
 import org.springframework.data.jpa.repository.JpaRepository;
 
-public interface CardRepository extends JpaRepository<Card, String> {
+import java.util.List;
+import java.util.Optional;
+
+public interface CardRepository extends JpaRepository<Card, Integer> {
+    List<Card> findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(Integer userId);
+
+    Optional<Card> findByIdAndUserId(Integer id, Integer userId);
 }

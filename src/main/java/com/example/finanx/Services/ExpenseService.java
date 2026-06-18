@@ -1,17 +1,18 @@
 package com.example.finanx.Services;
 
 import com.example.finanx.DTO.ExpenseRecord;
+import com.example.finanx.Entities.Card;
 import com.example.finanx.Entities.Expense;
 import com.example.finanx.Entities.User;
-import com.example.finanx.Exceptions.LimitExceededException;
 import com.example.finanx.Exceptions.ObjectNotFoundException;
+import com.example.finanx.Repositories.ExpenseInstallmentRepository;
 import com.example.finanx.Repositories.ExpenseRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.cglib.core.Local;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -22,103 +23,186 @@ public class ExpenseService {
     private final UserService userService;
     private final String TIME_ZONE = "America/Sao_Paulo";
     private final ExpenseInstallmentService installmentService;
+    private final ExpenseInstallmentRepository installmentRepository;
+    private final AuthenticatedUserService authenticatedUserService;
+    private final CardService cardService;
 
-    @Autowired
-    public ExpenseService(ExpenseRepository expenseRepository, UserService userService, ExpenseInstallmentService installmentService) {
+    public ExpenseService(ExpenseRepository expenseRepository, UserService userService,
+                          ExpenseInstallmentService installmentService,
+                          ExpenseInstallmentRepository installmentRepository,
+                          AuthenticatedUserService authenticatedUserService, CardService cardService) {
         this.expenseRepository = expenseRepository;
         this.userService = userService;
         this.installmentService = installmentService;
+        this.installmentRepository = installmentRepository;
+        this.authenticatedUserService = authenticatedUserService;
+        this.cardService = cardService;
     }
-
 
     public List<Expense> getAllExpenses() {
         return expenseRepository.findAll();
     }
 
+    public List<Expense> findAuthenticatedUserExpenses(Integer month, Integer year, Integer cardId) {
+        User user = authenticatedUserService.getAuthenticatedUser();
+        validateMonthYear(month, year);
+        if (cardId != null) {
+            cardService.findUserCard(user.getId(), cardId);
+        }
+        return expenseRepository.findByFilters(user.getId(), month, year, cardId);
+    }
 
     public Expense getExpenseById(Integer id) {
         return expenseRepository.findById(id)
                 .orElseThrow(() -> new ObjectNotFoundException("Expense not found with id: " + id));
     }
 
+    public Expense getAuthenticatedUserExpense(Integer id) {
+        User user = authenticatedUserService.getAuthenticatedUser();
+        return findOwnedExpense(user.getId(), id);
+    }
+
     public String getSumAmountByUserId(Integer userId) {
-        double sumAmountByUser = expenseRepository.sumAmountByUserId(userId);
+        BigDecimal sumAmountByUser = zeroIfNull(expenseRepository.sumAmountByUserId(userId));
         User user = userService.findById(userId);
-        if (sumAmountByUser >= user.getMonthLimit()) {
+        if (sumAmountByUser.compareTo(user.getMonthLimit()) >= 0) {
             return "Your month limit exceeded, here's your total for this month " + sumAmountByUser;
         }
-        return Double.toString(sumAmountByUser);
+        return sumAmountByUser.toString();
     }
 
     public String getSumAmountByUserIdInCurrentMonth(Integer userId) {
-        double sumAmountByUser = expenseRepository.sumAmountByUserIdInCurrentMonth(userId);
+        BigDecimal sumAmountByUser = zeroIfNull(expenseRepository.sumAmountByUserIdInCurrentMonth(userId));
         User user = userService.findById(userId);
-        if (sumAmountByUser >= user.getMonthLimit()) {
+        if (sumAmountByUser.compareTo(user.getMonthLimit()) >= 0) {
             return "Your month limit exceeded, here's your total for this month " + sumAmountByUser;
         }
-        return Double.toString(sumAmountByUser);
+        return sumAmountByUser.toString();
     }
 
     public Expense createExpense(ExpenseRecord obj) {
+        User user = authenticatedUserService.getAuthenticatedUser();
         Expense expense = fromDTO(obj);
-        if (obj.purchaseDate() == null) {
+        expense.setUserId(user.getId());
+        if (expense.getPurchaseDate() == null) {
             ZoneId zid = ZoneId.of(TIME_ZONE);
-            LocalDateTime currentDateTime = LocalDateTime.now(zid);
-            expense.setPurchaseDate(currentDateTime);
+            expense.setPurchaseDate(LocalDateTime.now(zid));
         }
+        validateExpense(expense);
+        Card card = resolveOwnedActiveCard(user.getId(), expense.getCardId());
+
         expenseRepository.save(expense);
-        installmentService.generateInstallments(expense);
-        return(expense);
+        installmentService.generateInstallments(expense, card);
+        return expense;
     }
 
-    public Expense update(Expense obj){
-        Expense newObj = expenseRepository.getReferenceById(obj.getId());
+    public Expense update(Integer id, ExpenseRecord objDTO) {
+        User user = authenticatedUserService.getAuthenticatedUser();
+        Expense obj = fromDTO(objDTO);
+        obj.setId(id);
+        obj.setUserId(user.getId());
+        Expense newObj = findOwnedExpense(user.getId(), id);
+        if (obj.getPurchaseDate() == null) {
+            obj.setPurchaseDate(newObj.getPurchaseDate());
+        }
+        validateExpense(obj);
+        Card card = resolveOwnedActiveCard(user.getId(), obj.getCardId());
+
         newObj.setName(obj.getName());
-        newObj.setDescription(obj.getDescription()); // Exemplo: copia a descrição
-        newObj.setAmount(obj.getAmount());         // Exemplo: copia o valor
+        newObj.setDescription(obj.getDescription());
+        newObj.setAmount(obj.getAmount());
+        newObj.setInstallmentCount(obj.getInstallmentCount());
         newObj.setPurchaseDate(obj.getPurchaseDate());
-        return expenseRepository.save(newObj);
+        newObj.setCardId(obj.getCardId());
+        Expense saved = expenseRepository.save(newObj);
+
+        installmentService.deleteByExpenseId(saved.getId());
+        installmentService.generateInstallments(saved, card);
+        return saved;
     }
 
     public void delete(Integer id) {
-        expenseRepository.deleteById(id);
+        User user = authenticatedUserService.getAuthenticatedUser();
+        Expense expense = findOwnedExpense(user.getId(), id);
+        installmentService.deleteByExpenseId(expense.getId());
+        expenseRepository.deleteById(expense.getId());
     }
 
-    public Double getTotalExpensesByUserId(Integer userId) {
-        return expenseRepository.sumAmountByUserId(userId);
+    public BigDecimal getTotalExpensesByUserId(Integer userId) {
+        return zeroIfNull(expenseRepository.sumAmountByUserId(userId));
     }
 
-    public Double getTotalExpensesByUserIdInCurrentMonth(Integer userId) {
-        return expenseRepository.sumAmountByUserIdInCurrentMonth(userId);
+    public BigDecimal getTotalExpensesByUserIdInCurrentMonth(Integer userId) {
+        YearMonth currentMonth = YearMonth.now();
+        return zeroIfNull(installmentRepository.sumByUserIdAndDueMonth(userId, currentMonth.getMonthValue(), currentMonth.getYear()));
     }
 
-    public Double getTotalExpensesByUserIdInAnyMonth(Integer userId, Integer month, Integer year) {
-        return expenseRepository.sumAmountByUserIdInAnyMonth(userId, month, year);
+    public BigDecimal getTotalExpensesByUserIdInAnyMonth(Integer userId, Integer month, Integer year) {
+        return zeroIfNull(installmentRepository.sumByUserIdAndDueMonth(userId, month, year));
     }
 
     public List<Expense> getExpensesByUserIdInCurrentMonth(Integer userId) {
-        return expenseRepository.findExpensesByUserIdAndPurchaseDateInCurrentMonth(userId);
+        YearMonth currentMonth = YearMonth.now();
+        return installmentRepository.findExpensesByUserIdAndDueMonth(userId, currentMonth.getMonthValue(), currentMonth.getYear());
     }
 
-    public List<Expense> getExpensesByUserIdInAnyMonth(Integer userId, Integer month, Integer year){
-        List<Expense> list = expenseRepository.findExpensesByUserIdAndPurchaseDateInAnyMonth(userId, month, year);
+    public List<Expense> getExpensesByUserIdInAnyMonth(Integer userId, Integer month, Integer year) {
+        List<Expense> list = installmentRepository.findExpensesByUserIdAndDueMonth(userId, month, year);
         if (list.isEmpty()) {
             throw new ObjectNotFoundException("There are no expenses for this user");
         }
         return list;
     }
 
-    public Expense fromDTO(ExpenseRecord objDTO){
-        return new Expense(objDTO.id(), objDTO.name(), objDTO.amount(), objDTO.installmentCount(), objDTO.purchaseDate(),objDTO.description(), objDTO.userId());
+    public Expense fromDTO(ExpenseRecord objDTO) {
+        return new Expense(objDTO.id(), objDTO.name(), objDTO.amount(), objDTO.installmentCount(),
+                objDTO.purchaseDate(), objDTO.description(), objDTO.userId(), objDTO.cardId());
     }
 
+    private Expense findOwnedExpense(Integer userId, Integer expenseId) {
+        Expense expense = getExpenseById(expenseId);
+        if (!expense.getUserId().equals(userId)) {
+            throw new ObjectNotFoundException("Expense not found with id: " + expenseId);
+        }
+        return expense;
+    }
+
+    private Card resolveOwnedActiveCard(Integer userId, Integer cardId) {
+        if (cardId == null) {
+            return null;
+        }
+        Card card = cardService.findUserCard(userId, cardId);
+        if (!Boolean.TRUE.equals(card.getActive())) {
+            throw new IllegalArgumentException("Card is inactive");
+        }
+        return card;
+    }
+
+    private void validateExpense(Expense expense) {
+        if (expense.getName() == null || expense.getName().isBlank()) {
+            throw new IllegalArgumentException("Expense name is required");
+        }
+        if (expense.getAmount() == null || expense.getAmount().compareTo(BigDecimal.ZERO) <= 0) {
+            throw new IllegalArgumentException("Expense amount must be greater than zero");
+        }
+        if (expense.getInstallmentCount() == null || expense.getInstallmentCount() < 1) {
+            throw new IllegalArgumentException("Installment count must be greater than zero");
+        }
+    }
+
+    private void validateMonthYear(Integer month, Integer year) {
+        if ((month == null && year != null) || (month != null && year == null)) {
+            throw new IllegalArgumentException("Month and year filters must be used together");
+        }
+        if (month != null && (month < 1 || month > 12)) {
+            throw new IllegalArgumentException("Month must be between 1 and 12");
+        }
+        if (year != null && year < 1900) {
+            throw new IllegalArgumentException("Year must be valid");
+        }
+    }
+
+    private BigDecimal zeroIfNull(BigDecimal value) {
+        return value == null ? BigDecimal.ZERO : value;
+    }
 }
-
-
-
-
-
-
-
-
-

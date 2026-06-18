@@ -2,6 +2,7 @@ package com.example.finanx.Entities;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -11,16 +12,18 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
-    private Double amount;
+    private BigDecimal amount;
     private String name;
     private Integer installmentCount;
     private LocalDateTime purchaseDate;
     private String description;
     private Integer userId;
+    private Integer cardId;
 
     public Expense(){}
 
-    public Expense(Integer id, String name, Double amount, Integer installmentCount, LocalDateTime purchaseDate, String description, Integer userId) {
+    public Expense(Integer id, String name, BigDecimal amount, Integer installmentCount, LocalDateTime purchaseDate,
+                   String description, Integer userId, Integer cardId) {
         this.id = id;
         this.name = name;
         this.amount = amount;
@@ -28,6 +31,7 @@ public class Expense {
         this.purchaseDate = purchaseDate;
         this.description = description;
         this.userId = userId;
+        this.cardId = cardId;
     }
 
     public Integer getId() {
@@ -38,11 +42,11 @@ public class Expense {
         this.id = id;
     }
 
-    public Double getAmount() {
+    public BigDecimal getAmount() {
         return amount;
     }
 
-    public void setAmount(Double amount) {
+    public void setAmount(BigDecimal amount) {
         this.amount = amount;
     }
 
@@ -88,6 +92,14 @@ public class Expense {
 
     public Integer getUserId() {
         return userId;
+    }
+
+    public Integer getCardId() {
+        return cardId;
+    }
+
+    public void setCardId(Integer cardId) {
+        this.cardId = cardId;
     }
 
 }

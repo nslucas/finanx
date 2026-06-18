@@ -2,6 +2,7 @@ package com.example.finanx.Entities;
 
 import jakarta.persistence.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @Entity
@@ -12,12 +13,12 @@ public class Wallet {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
     private String owner;
-    private Double balance;
+    private BigDecimal balance;
     @Transient
     private List<Card> cards;
     private Integer userId;
     
-    public Wallet(String owner, Double balance, List<Card> cards, Integer userId) {
+    public Wallet(String owner, BigDecimal balance, List<Card> cards, Integer userId) {
         this.owner = owner;
         this.balance = balance;
         this.cards = cards;
@@ -36,7 +37,7 @@ public class Wallet {
         this.owner = owner;
     }
 
-    public Double getBalance() {
+    public BigDecimal getBalance() {
         return balance;
     }
 
@@ -51,18 +52,18 @@ public class Wallet {
         return userId;
     }
 
-    public void addBalance(double value) {
-        if (value > 0) {
-            this.balance += value;
+    public void addBalance(BigDecimal value) {
+        if (value.compareTo(BigDecimal.ZERO) > 0) {
+            this.balance = this.balance.add(value);
         } else {
             throw new IllegalArgumentException("The input value must be positive.");
         }
     }
 
-    public void removeBalance(double value) {
-        if (value > 0) {
-            if (value <= this.balance) {
-                this.balance -= value;
+    public void removeBalance(BigDecimal value) {
+        if (value.compareTo(BigDecimal.ZERO) > 0) {
+            if (value.compareTo(this.balance) <= 0) {
+                this.balance = this.balance.subtract(value);
             } else {
                 throw new IllegalArgumentException("Insufficient balance for the operation!");
             }
@@ -72,8 +73,7 @@ public class Wallet {
     }
 
     public Integer getId() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getId'");
+        return id;
     }
 
 
