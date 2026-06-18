@@ -68,6 +68,15 @@ public class TransactionService {
         return post(userId, accountId, TransactionType.CARD_PAYMENT, amount, occurredAt, description, null, null, true);
     }
 
+    public Transaction createRecurringTransaction(Integer userId, Integer accountId, TransactionType type,
+                                                  BigDecimal amount, LocalDateTime occurredAt, String description,
+                                                  Integer categoryId) {
+        if (type != TransactionType.INCOME && type != TransactionType.EXPENSE) {
+            throw new IllegalArgumentException("Recurring account transactions must be income or expense");
+        }
+        return post(userId, accountId, type, amount, occurredAt, description, null, categoryId, true);
+    }
+
     public void createTransfer(Integer sourceAccountId, TransferRecord record) {
         if (record == null) {
             throw new IllegalArgumentException("Transfer body is required");

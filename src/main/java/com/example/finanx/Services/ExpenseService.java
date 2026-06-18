@@ -101,6 +101,20 @@ public class ExpenseService {
         return expense;
     }
 
+    public Expense createRecurringExpense(Integer userId, String name, BigDecimal amount, Integer installmentCount,
+                                          LocalDateTime purchaseDate, String description, Integer cardId,
+                                          Integer categoryId) {
+        Expense expense = new Expense(null, name, amount, installmentCount, purchaseDate, description,
+                userId, cardId, categoryId);
+        validateExpense(expense);
+        Card card = resolveOwnedActiveCard(userId, cardId);
+        validateExpenseCategory(userId, categoryId);
+
+        expenseRepository.save(expense);
+        installmentService.generateInstallments(expense, card);
+        return expense;
+    }
+
     public Expense update(Integer id, ExpenseRecord objDTO) {
         User user = authenticatedUserService.getAuthenticatedUser();
         Expense obj = fromDTO(objDTO);
