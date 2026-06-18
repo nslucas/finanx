@@ -27,4 +27,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, Intege
             "AND MONTH(t.occurredAt) = :month AND YEAR(t.occurredAt) = :year")
     BigDecimal sumByUserIdTypeAndMonth(@Param("userId") Integer userId, @Param("type") TransactionType type,
                                        @Param("month") Integer month, @Param("year") Integer year);
+
+    @Query("SELECT t.categoryId, SUM(t.amount) FROM Transaction t WHERE t.userId = :userId " +
+            "AND t.type = :type " +
+            "AND MONTH(t.occurredAt) = :month AND YEAR(t.occurredAt) = :year " +
+            "GROUP BY t.categoryId")
+    List<Object[]> sumExpenseTransactionsByCategory(@Param("userId") Integer userId,
+                                                    @Param("month") Integer month,
+                                                    @Param("year") Integer year,
+                                                    @Param("type") TransactionType type);
 }

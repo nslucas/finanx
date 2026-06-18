@@ -35,7 +35,8 @@ public class ExpenseResource {
     public ResponseEntity<ExpenseRecord> findById(@PathVariable Integer id){
         Expense obj = service.getAuthenticatedUserExpense(id);
         ExpenseRecord expenseRecord = new ExpenseRecord(obj.getId(),  obj.getName(), obj.getAmount(),
-                obj.getInstallmentCount(), obj.getPurchaseDate(), obj.getDescription(), obj.getUserId(), obj.getCardId());
+                obj.getInstallmentCount(), obj.getPurchaseDate(), obj.getDescription(), obj.getUserId(),
+                obj.getCardId(), obj.getCategoryId());
         return ResponseEntity.ok().body(expenseRecord);
     }
 

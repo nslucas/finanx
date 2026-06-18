@@ -3,6 +3,7 @@ package com.example.finanx.Services;
 import com.example.finanx.DTO.TransactionRecord;
 import com.example.finanx.DTO.TransferRecord;
 import com.example.finanx.Entities.Account;
+import com.example.finanx.Entities.CategoryType;
 import com.example.finanx.Entities.Transaction;
 import com.example.finanx.Entities.TransactionType;
 import com.example.finanx.Entities.User;
@@ -24,12 +25,14 @@ public class TransactionService {
     private final TransactionRepository transactionRepository;
     private final AuthenticatedUserService authenticatedUserService;
     private final AccountService accountService;
+    private final CategoryService categoryService;
 
     public TransactionService(TransactionRepository transactionRepository, AuthenticatedUserService authenticatedUserService,
-                              AccountService accountService) {
+                              AccountService accountService, CategoryService categoryService) {
         this.transactionRepository = transactionRepository;
         this.authenticatedUserService = authenticatedUserService;
         this.accountService = accountService;
+        this.categoryService = categoryService;
     }
 
     public List<Transaction> findAuthenticatedUserTransactions(Integer month, Integer year, Integer accountId,
@@ -57,12 +60,12 @@ public class TransactionService {
             throw new IllegalArgumentException("Use the dedicated endpoint for transfers and card payments");
         }
         return post(user.getId(), record.accountId(), record.type(), record.amount(), record.occurredAt(),
-                record.description(), null, true);
+                record.description(), null, record.categoryId(), true);
     }
 
     public Transaction createCardPaymentTransaction(Integer userId, Integer accountId, BigDecimal amount,
                                                     LocalDateTime occurredAt, String description) {
-        return post(userId, accountId, TransactionType.CARD_PAYMENT, amount, occurredAt, description, null, true);
+        return post(userId, accountId, TransactionType.CARD_PAYMENT, amount, occurredAt, description, null, null, true);
     }
 
     public void createTransfer(Integer sourceAccountId, TransferRecord record) {
@@ -87,9 +90,9 @@ public class TransactionService {
         accountService.applyDelta(user.getId(), target.getId(), record.amount());
 
         Transaction out = saveTransaction(user.getId(), source.getId(), TransactionType.TRANSFER_OUT,
-                record.amount(), occurredAt, record.description(), null);
+                record.amount(), occurredAt, record.description(), null, null);
         Transaction in = saveTransaction(user.getId(), target.getId(), TransactionType.TRANSFER_IN,
-                record.amount(), occurredAt, record.description(), out.getId());
+                record.amount(), occurredAt, record.description(), out.getId(), null);
         out.setRelatedTransactionId(in.getId());
         transactionRepository.save(out);
     }
@@ -118,20 +121,23 @@ public class TransactionService {
 
     private Transaction post(Integer userId, Integer accountId, TransactionType type, BigDecimal amount,
                              LocalDateTime occurredAt, String description, Integer relatedTransactionId,
-                             boolean updateBalance) {
+                             Integer categoryId, boolean updateBalance) {
         validateTransaction(type, amount);
+        validateCategory(userId, type, categoryId);
         Account account = accountService.findUserAccount(userId, accountId);
         accountService.ensureActive(account);
         if (updateBalance) {
             accountService.applyDelta(userId, accountId, balanceDelta(type, amount));
         }
-        return saveTransaction(userId, accountId, type, amount, defaultOccurredAt(occurredAt), description, relatedTransactionId);
+        return saveTransaction(userId, accountId, type, amount, defaultOccurredAt(occurredAt), description,
+                relatedTransactionId, categoryId);
     }
 
     private Transaction saveTransaction(Integer userId, Integer accountId, TransactionType type, BigDecimal amount,
-                                        LocalDateTime occurredAt, String description, Integer relatedTransactionId) {
+                                        LocalDateTime occurredAt, String description, Integer relatedTransactionId,
+                                        Integer categoryId) {
         Transaction transaction = new Transaction(null, type, amount, occurredAt, description, accountId,
-                relatedTransactionId, userId);
+                relatedTransactionId, userId, categoryId);
         return transactionRepository.save(transaction);
     }
 
@@ -163,6 +169,18 @@ public class TransactionService {
             return;
         }
         validatePositiveAmount(amount);
+    }
+
+    private void validateCategory(Integer userId, TransactionType type, Integer categoryId) {
+        if (categoryId == null) {
+            return;
+        }
+        switch (type) {
+            case INCOME -> categoryService.requireActiveCategory(userId, categoryId, CategoryType.INCOME);
+            case EXPENSE -> categoryService.requireActiveCategory(userId, categoryId, CategoryType.EXPENSE);
+            case TRANSFER_IN, TRANSFER_OUT, CARD_PAYMENT, ADJUSTMENT ->
+                    throw new IllegalArgumentException("Category is not allowed for this transaction type");
+        }
     }
 
     private void validatePositiveAmount(BigDecimal amount) {

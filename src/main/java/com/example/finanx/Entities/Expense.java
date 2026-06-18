@@ -19,11 +19,17 @@ public class Expense {
     private String description;
     private Integer userId;
     private Integer cardId;
+    private Integer categoryId;
 
     public Expense(){}
 
     public Expense(Integer id, String name, BigDecimal amount, Integer installmentCount, LocalDateTime purchaseDate,
                    String description, Integer userId, Integer cardId) {
+        this(id, name, amount, installmentCount, purchaseDate, description, userId, cardId, null);
+    }
+
+    public Expense(Integer id, String name, BigDecimal amount, Integer installmentCount, LocalDateTime purchaseDate,
+                   String description, Integer userId, Integer cardId, Integer categoryId) {
         this.id = id;
         this.name = name;
         this.amount = amount;
@@ -32,6 +38,7 @@ public class Expense {
         this.description = description;
         this.userId = userId;
         this.cardId = cardId;
+        this.categoryId = categoryId;
     }
 
     public Integer getId() {
@@ -100,6 +107,14 @@ public class Expense {
 
     public void setCardId(Integer cardId) {
         this.cardId = cardId;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 
 }

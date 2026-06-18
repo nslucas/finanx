@@ -19,16 +19,21 @@ public class MonthlySummaryService {
     private final CardRepository cardRepository;
     private final ExpenseInstallmentRepository installmentRepository;
     private final CardPaymentService cardPaymentService;
+    private final SpendingInsightService spendingInsightService;
+    private final BudgetService budgetService;
 
     public MonthlySummaryService(AuthenticatedUserService authenticatedUserService, TransactionService transactionService,
                                  AccountService accountService, CardRepository cardRepository,
-                                 ExpenseInstallmentRepository installmentRepository, CardPaymentService cardPaymentService) {
+                                 ExpenseInstallmentRepository installmentRepository, CardPaymentService cardPaymentService,
+                                 SpendingInsightService spendingInsightService, BudgetService budgetService) {
         this.authenticatedUserService = authenticatedUserService;
         this.transactionService = transactionService;
         this.accountService = accountService;
         this.cardRepository = cardRepository;
         this.installmentRepository = installmentRepository;
         this.cardPaymentService = cardPaymentService;
+        this.spendingInsightService = spendingInsightService;
+        this.budgetService = budgetService;
     }
 
     public MonthlySummaryResponse getMonthlySummary(Integer month, Integer year) {
@@ -55,7 +60,9 @@ public class MonthlySummaryService {
         }
 
         return new MonthlySummaryResponse(month, year, incomeTotal, accountExpenseTotal, cardPaymentsTotal,
-                netCashFlow, totalAccountBalance, cardBillsTotal, cardBillsRemaining);
+                netCashFlow, totalAccountBalance, cardBillsTotal, cardBillsRemaining,
+                spendingInsightService.getCategorySummary(month, year),
+                budgetService.getProgress(user.getId(), month, year));
     }
 
     private void validateMonthYear(Integer month, Integer year) {

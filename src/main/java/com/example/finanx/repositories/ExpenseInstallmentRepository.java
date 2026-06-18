@@ -43,4 +43,19 @@ public interface ExpenseInstallmentRepository extends JpaRepository <ExpenseInst
             "AND MONTH(i.dueDate) = :month AND YEAR(i.dueDate) = :year")
     BigDecimal sumCardStatement(@Param("userId") Integer userId, @Param("cardId") Integer cardId,
                                 @Param("month") Integer month, @Param("year") Integer year);
+
+    @Query("SELECT SUM(i.installmentAmount) FROM ExpenseInstallment i, Expense e " +
+            "WHERE i.id.expenseId = e.id AND e.userId = :userId AND e.cardId IS NOT NULL " +
+            "AND MONTH(i.dueDate) = :month AND YEAR(i.dueDate) = :year")
+    BigDecimal sumCardStatementByUserIdAndDueMonth(@Param("userId") Integer userId,
+                                                   @Param("month") Integer month,
+                                                   @Param("year") Integer year);
+
+    @Query("SELECT e.categoryId, SUM(i.installmentAmount) FROM ExpenseInstallment i, Expense e " +
+            "WHERE i.id.expenseId = e.id AND e.userId = :userId AND e.cardId IS NOT NULL " +
+            "AND MONTH(i.dueDate) = :month AND YEAR(i.dueDate) = :year " +
+            "GROUP BY e.categoryId")
+    List<Object[]> sumCardStatementInstallmentsByCategory(@Param("userId") Integer userId,
+                                                          @Param("month") Integer month,
+                                                          @Param("year") Integer year);
 }

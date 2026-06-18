@@ -19,12 +19,19 @@ public class Transaction {
     private Integer accountId;
     private Integer relatedTransactionId;
     private Integer userId;
+    private Integer categoryId;
 
     public Transaction() {
     }
 
     public Transaction(Integer id, TransactionType type, BigDecimal amount, LocalDateTime occurredAt,
                        String description, Integer accountId, Integer relatedTransactionId, Integer userId) {
+        this(id, type, amount, occurredAt, description, accountId, relatedTransactionId, userId, null);
+    }
+
+    public Transaction(Integer id, TransactionType type, BigDecimal amount, LocalDateTime occurredAt,
+                       String description, Integer accountId, Integer relatedTransactionId, Integer userId,
+                       Integer categoryId) {
         this.id = id;
         this.type = type;
         this.amount = amount;
@@ -33,6 +40,7 @@ public class Transaction {
         this.accountId = accountId;
         this.relatedTransactionId = relatedTransactionId;
         this.userId = userId;
+        this.categoryId = categoryId;
     }
 
     public Integer getId() {
@@ -97,5 +105,13 @@ public class Transaction {
 
     public void setUserId(Integer userId) {
         this.userId = userId;
+    }
+
+    public Integer getCategoryId() {
+        return categoryId;
+    }
+
+    public void setCategoryId(Integer categoryId) {
+        this.categoryId = categoryId;
     }
 }

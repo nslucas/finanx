@@ -2,6 +2,7 @@ package com.example.finanx.Services;
 
 import com.example.finanx.DTO.ExpenseRecord;
 import com.example.finanx.Entities.Card;
+import com.example.finanx.Entities.CategoryType;
 import com.example.finanx.Entities.Expense;
 import com.example.finanx.Entities.User;
 import com.example.finanx.Exceptions.ObjectNotFoundException;
@@ -26,17 +27,20 @@ public class ExpenseService {
     private final ExpenseInstallmentRepository installmentRepository;
     private final AuthenticatedUserService authenticatedUserService;
     private final CardService cardService;
+    private final CategoryService categoryService;
 
     public ExpenseService(ExpenseRepository expenseRepository, UserService userService,
                           ExpenseInstallmentService installmentService,
                           ExpenseInstallmentRepository installmentRepository,
-                          AuthenticatedUserService authenticatedUserService, CardService cardService) {
+                          AuthenticatedUserService authenticatedUserService, CardService cardService,
+                          CategoryService categoryService) {
         this.expenseRepository = expenseRepository;
         this.userService = userService;
         this.installmentService = installmentService;
         this.installmentRepository = installmentRepository;
         this.authenticatedUserService = authenticatedUserService;
         this.cardService = cardService;
+        this.categoryService = categoryService;
     }
 
     public List<Expense> getAllExpenses() {
@@ -90,6 +94,7 @@ public class ExpenseService {
         }
         validateExpense(expense);
         Card card = resolveOwnedActiveCard(user.getId(), expense.getCardId());
+        validateExpenseCategory(user.getId(), expense.getCategoryId());
 
         expenseRepository.save(expense);
         installmentService.generateInstallments(expense, card);
@@ -107,6 +112,7 @@ public class ExpenseService {
         }
         validateExpense(obj);
         Card card = resolveOwnedActiveCard(user.getId(), obj.getCardId());
+        validateExpenseCategory(user.getId(), obj.getCategoryId());
 
         newObj.setName(obj.getName());
         newObj.setDescription(obj.getDescription());
@@ -114,6 +120,7 @@ public class ExpenseService {
         newObj.setInstallmentCount(obj.getInstallmentCount());
         newObj.setPurchaseDate(obj.getPurchaseDate());
         newObj.setCardId(obj.getCardId());
+        newObj.setCategoryId(obj.getCategoryId());
         Expense saved = expenseRepository.save(newObj);
 
         installmentService.deleteByExpenseId(saved.getId());
@@ -156,7 +163,7 @@ public class ExpenseService {
 
     public Expense fromDTO(ExpenseRecord objDTO) {
         return new Expense(objDTO.id(), objDTO.name(), objDTO.amount(), objDTO.installmentCount(),
-                objDTO.purchaseDate(), objDTO.description(), objDTO.userId(), objDTO.cardId());
+                objDTO.purchaseDate(), objDTO.description(), objDTO.userId(), objDTO.cardId(), objDTO.categoryId());
     }
 
     private Expense findOwnedExpense(Integer userId, Integer expenseId) {
@@ -176,6 +183,12 @@ public class ExpenseService {
             throw new IllegalArgumentException("Card is inactive");
         }
         return card;
+    }
+
+    private void validateExpenseCategory(Integer userId, Integer categoryId) {
+        if (categoryId != null) {
+            categoryService.requireActiveCategory(userId, categoryId, CategoryType.EXPENSE);
+        }
     }
 
     private void validateExpense(Expense expense) {
