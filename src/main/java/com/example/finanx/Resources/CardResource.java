@@ -1,8 +1,11 @@
 package com.example.finanx.Resources;
 
 import com.example.finanx.DTO.CardRecord;
+import com.example.finanx.DTO.CardPaymentRecord;
 import com.example.finanx.DTO.CardStatementResponse;
 import com.example.finanx.Entities.Card;
+import com.example.finanx.Entities.CardPayment;
+import com.example.finanx.Services.CardPaymentService;
 import com.example.finanx.Services.CardService;
 import com.example.finanx.Services.CardStatementService;
 import org.springframework.http.ResponseEntity;
@@ -17,10 +20,12 @@ import java.util.List;
 public class CardResource {
     private final CardService service;
     private final CardStatementService statementService;
+    private final CardPaymentService paymentService;
 
-    public CardResource(CardService service, CardStatementService statementService) {
+    public CardResource(CardService service, CardStatementService statementService, CardPaymentService paymentService) {
         this.service = service;
         this.statementService = statementService;
+        this.paymentService = paymentService;
     }
 
     @GetMapping
@@ -69,5 +74,25 @@ public class CardResource {
     @GetMapping("/{id}/statements/current")
     public ResponseEntity<CardStatementResponse> getCurrentStatement(@PathVariable Integer id) {
         return ResponseEntity.ok(statementService.getCurrentStatement(id));
+    }
+
+    @PostMapping("/{id}/payments")
+    public ResponseEntity<CardPaymentRecord> createPayment(@PathVariable Integer id, @RequestBody CardPaymentRecord record) {
+        CardPayment payment = paymentService.create(id, record);
+        URI uri = ServletUriComponentsBuilder.fromCurrentRequest()
+                .path("/{paymentId}")
+                .buildAndExpand(payment.getId())
+                .toUri();
+        return ResponseEntity.created(uri).body(new CardPaymentRecord(payment));
+    }
+
+    @GetMapping("/{id}/payments")
+    public ResponseEntity<List<CardPaymentRecord>> findPayments(@PathVariable Integer id,
+                                                                @RequestParam Integer month,
+                                                                @RequestParam Integer year) {
+        List<CardPaymentRecord> payments = paymentService.findPayments(id, month, year).stream()
+                .map(CardPaymentRecord::new)
+                .toList();
+        return ResponseEntity.ok(payments);
     }
 }
