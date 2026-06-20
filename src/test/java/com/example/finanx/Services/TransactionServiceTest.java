@@ -2,7 +2,7 @@ package com.example.finanx.Services;
 
 import com.example.finanx.DTO.TransactionRecord;
 import com.example.finanx.Entities.*;
-import com.example.finanx.Repositories.TransactionRepository;
+import com.example.finanx.repositories.TransactionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

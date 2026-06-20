@@ -3,7 +3,7 @@ package com.example.finanx.Services;
 import com.example.finanx.Entities.Card;
 import com.example.finanx.Entities.Expense;
 import com.example.finanx.Entities.ExpenseInstallment;
-import com.example.finanx.Repositories.ExpenseInstallmentRepository;
+import com.example.finanx.repositories.ExpenseInstallmentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

@@ -5,9 +5,9 @@ import com.example.finanx.Entities.Category;
 import com.example.finanx.Entities.CategoryType;
 import com.example.finanx.Entities.TransactionType;
 import com.example.finanx.Entities.User;
-import com.example.finanx.Repositories.CategoryRepository;
-import com.example.finanx.Repositories.ExpenseInstallmentRepository;
-import com.example.finanx.Repositories.TransactionRepository;
+import com.example.finanx.repositories.CategoryRepository;
+import com.example.finanx.repositories.ExpenseInstallmentRepository;
+import com.example.finanx.repositories.TransactionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;
@@ -36,9 +36,9 @@ class SpendingInsightServiceTest {
         User user = new User(1, "Lucas", "Nunes", BigDecimal.valueOf(1000), "lucas@test.com");
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(user);
         when(transactionRepository.sumExpenseTransactionsByCategory(1, 6, 2026, TransactionType.EXPENSE))
-                .thenReturn(List.of(new Object[]{50, BigDecimal.valueOf(70)}));
+                .thenReturn(List.<Object[]>of(new Object[]{50, BigDecimal.valueOf(70)}));
         when(installmentRepository.sumCardStatementInstallmentsByCategory(1, 6, 2026))
-                .thenReturn(List.of(new Object[]{50, BigDecimal.valueOf(30)}, new Object[]{null, BigDecimal.valueOf(10)}));
+                .thenReturn(List.<Object[]>of(new Object[]{50, BigDecimal.valueOf(30)}, new Object[]{null, BigDecimal.valueOf(10)}));
         when(categoryRepository.findByIdAndUserId(50, 1))
                 .thenReturn(Optional.of(new Category(50, "Groceries", CategoryType.EXPENSE, true, 1)));
 

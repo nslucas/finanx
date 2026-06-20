@@ -6,8 +6,8 @@ import com.example.finanx.Entities.CategoryType;
 import com.example.finanx.Entities.Expense;
 import com.example.finanx.Entities.User;
 import com.example.finanx.Exceptions.ObjectNotFoundException;
-import com.example.finanx.Repositories.ExpenseInstallmentRepository;
-import com.example.finanx.Repositories.ExpenseRepository;
+import com.example.finanx.repositories.ExpenseInstallmentRepository;
+import com.example.finanx.repositories.ExpenseRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

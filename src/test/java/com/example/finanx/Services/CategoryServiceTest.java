@@ -4,7 +4,7 @@ import com.example.finanx.DTO.CategoryRecord;
 import com.example.finanx.Entities.Category;
 import com.example.finanx.Entities.CategoryType;
 import com.example.finanx.Entities.User;
-import com.example.finanx.Repositories.CategoryRepository;
+import com.example.finanx.repositories.CategoryRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

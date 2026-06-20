@@ -6,7 +6,7 @@ import com.example.finanx.DTO.RegisterDTO;
 import com.example.finanx.Entities.User;
 import com.example.finanx.Entities.UserRole;
 import com.example.finanx.Infra.Security.TokenService;
-import com.example.finanx.Repositories.UserRepository;
+import com.example.finanx.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;

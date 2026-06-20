@@ -2,8 +2,8 @@ package com.example.finanx.Services;
 
 import com.example.finanx.DTO.RecurringOccurrenceRequest;
 import com.example.finanx.Entities.*;
-import com.example.finanx.Repositories.RecurringOccurrenceRepository;
-import com.example.finanx.Repositories.RecurringTransactionRepository;
+import com.example.finanx.repositories.RecurringOccurrenceRepository;
+import com.example.finanx.repositories.RecurringTransactionRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;

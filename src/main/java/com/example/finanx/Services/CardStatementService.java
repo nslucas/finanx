@@ -3,9 +3,9 @@ package com.example.finanx.Services;
 import com.example.finanx.DTO.CardStatementResponse;
 import com.example.finanx.DTO.ExpenseInstallmentRecord;
 import com.example.finanx.Entities.*;
-import com.example.finanx.Repositories.CardPaymentRepository;
-import com.example.finanx.Repositories.ExpenseInstallmentRepository;
-import com.example.finanx.Repositories.ExpenseRepository;
+import com.example.finanx.repositories.CardPaymentRepository;
+import com.example.finanx.repositories.ExpenseInstallmentRepository;
+import com.example.finanx.repositories.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

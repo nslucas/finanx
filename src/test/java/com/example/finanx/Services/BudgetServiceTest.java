@@ -3,7 +3,7 @@ package com.example.finanx.Services;
 import com.example.finanx.DTO.BudgetProgressRecord;
 import com.example.finanx.DTO.BudgetRecord;
 import com.example.finanx.Entities.*;
-import com.example.finanx.Repositories.BudgetRepository;
+import com.example.finanx.repositories.BudgetRepository;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

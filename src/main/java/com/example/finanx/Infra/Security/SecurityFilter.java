@@ -1,6 +1,6 @@
 package com.example.finanx.Infra.Security;
 
-import com.example.finanx.Repositories.UserRepository;
+import com.example.finanx.repositories.UserRepository;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;

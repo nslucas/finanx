@@ -2,7 +2,7 @@ package com.example.finanx.Services;
 
 import com.example.finanx.DTO.CardPaymentRecord;
 import com.example.finanx.Entities.*;
-import com.example.finanx.Repositories.CardPaymentRepository;
+import com.example.finanx.repositories.CardPaymentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

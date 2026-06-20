@@ -2,7 +2,7 @@ package com.example.finanx.Services;
 
 import com.example.finanx.DTO.ForecastResponse;
 import com.example.finanx.Entities.User;
-import com.example.finanx.Repositories.*;
+import com.example.finanx.repositories.*;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.Mock;

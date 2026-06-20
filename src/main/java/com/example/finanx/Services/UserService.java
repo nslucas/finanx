@@ -3,7 +3,7 @@ package com.example.finanx.Services;
 import com.example.finanx.DTO.UserRecord;
 import com.example.finanx.Entities.User;
 import com.example.finanx.Exceptions.ObjectNotFoundException;
-import com.example.finanx.Repositories.UserRepository;
+import com.example.finanx.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 

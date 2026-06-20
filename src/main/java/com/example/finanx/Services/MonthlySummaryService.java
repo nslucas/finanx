@@ -4,8 +4,8 @@ import com.example.finanx.DTO.MonthlySummaryResponse;
 import com.example.finanx.Entities.Card;
 import com.example.finanx.Entities.TransactionType;
 import com.example.finanx.Entities.User;
-import com.example.finanx.Repositories.CardRepository;
-import com.example.finanx.Repositories.ExpenseInstallmentRepository;
+import com.example.finanx.repositories.CardRepository;
+import com.example.finanx.repositories.ExpenseInstallmentRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

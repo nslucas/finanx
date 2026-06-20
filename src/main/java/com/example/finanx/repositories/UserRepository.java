@@ -1,4 +1,4 @@
-package com.example.finanx.Repositories;
+package com.example.finanx.repositories;
 
 import com.example.finanx.Entities.User;
 import org.springframework.data.jpa.repository.JpaRepository;

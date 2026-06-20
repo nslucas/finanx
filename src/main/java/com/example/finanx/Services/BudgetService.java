@@ -4,7 +4,7 @@ import com.example.finanx.DTO.BudgetProgressRecord;
 import com.example.finanx.DTO.BudgetRecord;
 import com.example.finanx.Entities.*;
 import com.example.finanx.Exceptions.ObjectNotFoundException;
-import com.example.finanx.Repositories.BudgetRepository;
+import com.example.finanx.repositories.BudgetRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

@@ -2,7 +2,7 @@ package com.example.finanx.Services;
 
 import com.example.finanx.DTO.*;
 import com.example.finanx.Entities.*;
-import com.example.finanx.Repositories.*;
+import com.example.finanx.repositories.*;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

@@ -4,7 +4,7 @@ import com.example.finanx.DTO.CardRecord;
 import com.example.finanx.Entities.Card;
 import com.example.finanx.Entities.User;
 import com.example.finanx.Exceptions.ObjectNotFoundException;
-import com.example.finanx.Repositories.CardRepository;
+import com.example.finanx.repositories.CardRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;

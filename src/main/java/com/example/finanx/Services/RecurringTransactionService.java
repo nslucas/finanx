@@ -5,8 +5,8 @@ import com.example.finanx.DTO.RecurringOccurrenceRequest;
 import com.example.finanx.DTO.RecurringTransactionRecord;
 import com.example.finanx.Entities.*;
 import com.example.finanx.Exceptions.ObjectNotFoundException;
-import com.example.finanx.Repositories.RecurringOccurrenceRepository;
-import com.example.finanx.Repositories.RecurringTransactionRepository;
+import com.example.finanx.repositories.RecurringOccurrenceRepository;
+import com.example.finanx.repositories.RecurringTransactionRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 

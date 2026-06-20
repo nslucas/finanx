@@ -1,7 +1,7 @@
 package com.example.finanx.Services;
 
 import com.example.finanx.Entities.User;
-import com.example.finanx.Repositories.UserRepository;
+import com.example.finanx.repositories.UserRepository;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;

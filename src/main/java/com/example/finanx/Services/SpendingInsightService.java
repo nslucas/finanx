@@ -6,9 +6,9 @@ import com.example.finanx.Entities.Category;
 import com.example.finanx.Entities.CategoryType;
 import com.example.finanx.Entities.TransactionType;
 import com.example.finanx.Entities.User;
-import com.example.finanx.Repositories.CategoryRepository;
-import com.example.finanx.Repositories.ExpenseInstallmentRepository;
-import com.example.finanx.Repositories.TransactionRepository;
+import com.example.finanx.repositories.CategoryRepository;
+import com.example.finanx.repositories.ExpenseInstallmentRepository;
+import com.example.finanx.repositories.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
