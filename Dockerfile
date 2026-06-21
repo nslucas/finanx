@@ -13,8 +13,12 @@ FROM eclipse-temurin:17-jre-jammy
 
 WORKDIR /app
 
-COPY --from=build /app/target/*.jar app.jar
+RUN addgroup --system app && adduser --system --ingroup app app
+
+COPY --from=build --chown=app:app /app/target/*.jar app.jar
 
 EXPOSE 8080
+
+USER app
 
 ENTRYPOINT ["java", "-jar", "app.jar"]

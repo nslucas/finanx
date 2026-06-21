@@ -42,6 +42,12 @@ git clone https://github.com/nslucas/prospera.git
 
 The application can also run with Docker Compose. The API and MySQL database are started in separate containers.
 
+Create a local `.env` file from the example and replace every secret before starting the stack:
+
+```bash
+cp .env.example .env
+```
+
 ```bash
 docker compose up --build
 ```
@@ -49,9 +55,8 @@ docker compose up --build
 Services exposed locally:
 
 - API: http://localhost:8080
-- MySQL: localhost:3306
 
-The default database created by Compose is `prospera`, with user `prospera` and password `prospera`. The API reads the database connection from container environment variables and connects to the database service through the internal Docker hostname `db`.
+By default, the API is bound to `127.0.0.1:8080`, so it is reachable from the VPS itself and from a local reverse proxy, but not directly exposed on the public network interface. MySQL is not published to the host; only the API container can reach it through the internal Docker hostname `db`.
 
 The production domain `appprospera.com.br` is allowed by the default CORS configuration, including `www.appprospera.com.br` and `api.appprospera.com.br`. To override the allowed origins, set `CORS_ALLOWED_ORIGIN_PATTERNS` with a comma-separated list before starting Compose.
 

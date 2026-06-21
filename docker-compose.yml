@@ -8,33 +8,61 @@ services:
       db:
         condition: service_healthy
     environment:
-      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/prospera?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
-      SPRING_DATASOURCE_USERNAME: prospera
-      SPRING_DATASOURCE_PASSWORD: prospera
-      JWT_SECRET: ${JWT_SECRET:-my-secret-key}
-      CORS_ALLOWED_ORIGIN_PATTERNS: ${CORS_ALLOWED_ORIGIN_PATTERNS:-http://localhost:*,http://127.0.0.1:*,https://appprospera.com.br,https://www.appprospera.com.br,https://api.appprospera.com.br}
+      SPRING_DATASOURCE_URL: "jdbc:mysql://db:3306/${MYSQL_DATABASE:-prospera}?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC"
+      SPRING_DATASOURCE_USERNAME: "${MYSQL_USER:-prospera}"
+      SPRING_DATASOURCE_PASSWORD: "${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}"
+      JWT_SECRET: "${JWT_SECRET:?Set JWT_SECRET in .env}"
+      CORS_ALLOWED_ORIGIN_PATTERNS: "${CORS_ALLOWED_ORIGIN_PATTERNS:-http://localhost:*,http://127.0.0.1:*,https://appprospera.com.br,https://www.appprospera.com.br,https://api.appprospera.com.br}"
     ports:
-      - "8080:8080"
+      - "${API_BIND_ADDRESS:-127.0.0.1}:${API_PORT:-8080}:8080"
+    networks:
+      - prospera-private
+    security_opt:
+      - no-new-privileges:true
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
 
   db:
     image: mysql:8.0
     container_name: prospera-db
     environment:
-      MYSQL_DATABASE: prospera
-      MYSQL_USER: prospera
-      MYSQL_PASSWORD: prospera
-      MYSQL_ROOT_PASSWORD: root
-    ports:
-      - "3306:3306"
+      MYSQL_DATABASE: "${MYSQL_DATABASE:-prospera}"
+      MYSQL_USER: "${MYSQL_USER:-prospera}"
+      MYSQL_PASSWORD: "${MYSQL_PASSWORD:?Set MYSQL_PASSWORD in .env}"
+      MYSQL_ROOT_PASSWORD: "${MYSQL_ROOT_PASSWORD:?Set MYSQL_ROOT_PASSWORD in .env}"
+    expose:
+      - "3306"
     volumes:
       - prospera-db-data:/var/lib/mysql
+    networks:
+      - prospera-private
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uprospera", "-pprospera"]
+      test: ["CMD-SHELL", "mysqladmin ping -h localhost -u\"$${MYSQL_USER}\" --password=\"$${MYSQL_PASSWORD}\""]
       interval: 10s
       timeout: 5s
       retries: 10
+      start_period: 30s
+    security_opt:
+      - no-new-privileges:true
+    logging:
+      driver: json-file
+      options:
+        max-size: "10m"
+        max-file: "3"
     restart: unless-stopped
+
+networks:
+  prospera-private:
+    driver: bridge
 
 volumes:
   prospera-db-data:
