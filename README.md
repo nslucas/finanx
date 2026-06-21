@@ -38,6 +38,35 @@ git clone https://github.com/nslucas/prospera.git
 1. Make sure that MySQL service is running, if it is not, start the service in Task Explorer -> Services -> MySQL80
 2. The API will be accessible at http://localhost:8080
 
+## Running with Docker Compose
+
+The application can also run with Docker Compose. The API and MySQL database are started in separate containers.
+
+```bash
+docker compose up --build
+```
+
+Services exposed locally:
+
+- API: http://localhost:8080
+- MySQL: localhost:3306
+
+The default database created by Compose is `prospera`, with user `prospera` and password `prospera`. The API reads the database connection from container environment variables and connects to the database service through the internal Docker hostname `db`.
+
+The production domain `appprospera.com.br` is allowed by the default CORS configuration, including `www.appprospera.com.br` and `api.appprospera.com.br`. To override the allowed origins, set `CORS_ALLOWED_ORIGIN_PATTERNS` with a comma-separated list before starting Compose.
+
+To stop the containers:
+
+```bash
+docker compose down
+```
+
+To stop the containers and remove the persisted database volume:
+
+```bash
+docker compose down -v
+```
+
 
 ## API Endpoints
 The API provides the following endpoints:

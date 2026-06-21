@@ -1,0 +1,16 @@
+.git
+.github
+.agents
+.codex
+.mvn/wrapper/maven-wrapper.jar.sha256
+target
+build
+dist
+.idea
+.vscode
+*.iml
+*.log
+.env
+Dockerfile
+docker-compose.yml
+README.md

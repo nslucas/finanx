@@ -1,0 +1,40 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: prospera-api
+    depends_on:
+      db:
+        condition: service_healthy
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:mysql://db:3306/prospera?allowPublicKeyRetrieval=true&useSSL=false&serverTimezone=UTC
+      SPRING_DATASOURCE_USERNAME: prospera
+      SPRING_DATASOURCE_PASSWORD: prospera
+      JWT_SECRET: ${JWT_SECRET:-my-secret-key}
+      CORS_ALLOWED_ORIGIN_PATTERNS: ${CORS_ALLOWED_ORIGIN_PATTERNS:-http://localhost:*,http://127.0.0.1:*,https://appprospera.com.br,https://www.appprospera.com.br,https://api.appprospera.com.br}
+    ports:
+      - "8080:8080"
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    container_name: prospera-db
+    environment:
+      MYSQL_DATABASE: prospera
+      MYSQL_USER: prospera
+      MYSQL_PASSWORD: prospera
+      MYSQL_ROOT_PASSWORD: root
+    ports:
+      - "3306:3306"
+    volumes:
+      - prospera-db-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-uprospera", "-pprospera"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    restart: unless-stopped
+
+volumes:
+  prospera-db-data:
