@@ -59,6 +59,16 @@ services:
         max-size: "10m"
         max-file: "3"
     restart: unless-stopped
+  frontend:
+    build:
+      context: ../prospera-frontend
+      dockerfile: Dockerfile
+    container_name: prospera-frontend
+    environment:
+      VITE_API_BASE_URL: https://api.appprospera.com.br
+    ports:
+      - "127.0.0.1:3000:80"
+    restart: unless-stopped
 
 networks:
   prospera-private:
