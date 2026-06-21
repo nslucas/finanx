@@ -1,4 +1,4 @@
-# Finanx API
+# Prospera API
 
 ![Java](https://img.shields.io/badge/java-%23ED8B00.svg?style=for-the-badge&logo=openjdk&logoColor=white)
 ![Spring](https://img.shields.io/badge/spring-%236DB33F.svg?style=for-the-badge&logo=spring&logoColor=white)
@@ -26,7 +26,7 @@ DISCLAIMER: currently the API can only read, update, register, and delete users 
 1. Clone the repository:
 
 ```bash
-git clone https://github.com/nslucas/finanx.git
+git clone https://github.com/nslucas/prospera.git
 ```
 
 2. Install dependencies with Maven

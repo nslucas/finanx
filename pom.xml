@@ -9,10 +9,10 @@
 		<relativePath/> <!-- lookup parent from repository -->
 	</parent>
 	<groupId>com.example</groupId>
-	<artifactId>finanx</artifactId>
+	<artifactId>prospera</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
-	<name>finanx</name>
-	<description>finanx</description>
+	<name>Prospera</name>
+	<description>Prospera</description>
 	<properties>
 		<java.version>17</java.version>
 	</properties>

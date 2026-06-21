@@ -1,4 +1,4 @@
-# Finanx API Handoff for Frontend
+# Prospera API Handoff for Frontend
 
 This document describes the current REST API surface for the finance-tracking frontend. The API is centered on authenticated, user-owned finances: accounts, cards, transactions, expenses, budgets, recurrences, summaries, forecasts, and derived alerts.
 
