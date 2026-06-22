@@ -9,7 +9,11 @@ import com.example.prospera.repositories.ExpenseInstallmentRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.YearMonth;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class MonthlySummaryService {
@@ -48,10 +52,17 @@ public class MonthlySummaryService {
 
         BigDecimal cardBillsTotal = BigDecimal.ZERO;
         BigDecimal cardBillsRemaining = BigDecimal.ZERO;
+        YearMonth statementMonth = YearMonth.of(year, month);
+        LocalDate from = statementMonth.atDay(1);
+        LocalDate to = statementMonth.plusMonths(1).atDay(1);
+        Map<Integer, BigDecimal> statementTotalsByCard = totalsByCard(
+                installmentRepository.sumCardStatementsByCardInDueDateRange(user.getId(), from, to));
+        Map<Integer, BigDecimal> paymentsByCard = totalsByCard(
+                cardPaymentService.getPaidAmountsByCard(user.getId(), month, year));
         List<Card> cards = cardRepository.findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(user.getId());
         for (Card card : cards) {
-            BigDecimal statementTotal = zeroIfNull(installmentRepository.sumCardStatement(user.getId(), card.getId(), month, year));
-            BigDecimal paidAmount = cardPaymentService.getPaidAmount(user.getId(), card.getId(), month, year);
+            BigDecimal statementTotal = statementTotalsByCard.getOrDefault(card.getId(), BigDecimal.ZERO);
+            BigDecimal paidAmount = paymentsByCard.getOrDefault(card.getId(), BigDecimal.ZERO);
             cardBillsTotal = cardBillsTotal.add(statementTotal);
             BigDecimal remaining = statementTotal.subtract(paidAmount);
             if (remaining.compareTo(BigDecimal.ZERO) > 0) {
@@ -76,5 +87,16 @@ public class MonthlySummaryService {
 
     private BigDecimal zeroIfNull(BigDecimal value) {
         return value == null ? BigDecimal.ZERO : value;
+    }
+
+    private Map<Integer, BigDecimal> totalsByCard(List<Object[]> rows) {
+        Map<Integer, BigDecimal> totals = new HashMap<>();
+        if (rows == null) {
+            return totals;
+        }
+        for (Object[] row : rows) {
+            totals.put((Integer) row[0], zeroIfNull((BigDecimal) row[1]));
+        }
+        return totals;
     }
 }

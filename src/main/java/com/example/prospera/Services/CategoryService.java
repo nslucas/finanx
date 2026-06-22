@@ -9,6 +9,7 @@ import com.example.prospera.repositories.CategoryRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
+import java.util.Collection;
 import java.util.List;
 
 @Service
@@ -35,6 +36,13 @@ public class CategoryService {
     public Category findUserCategory(Integer userId, Integer categoryId) {
         return categoryRepository.findByIdAndUserId(categoryId, userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Category not found with id: " + categoryId));
+    }
+
+    public List<Category> findUserCategories(Integer userId, Collection<Integer> categoryIds) {
+        if (categoryIds == null || categoryIds.isEmpty()) {
+            return List.of();
+        }
+        return categoryRepository.findByUserIdAndIdIn(userId, categoryIds);
     }
 
     public Category requireActiveCategory(Integer userId, Integer categoryId, CategoryType type) {

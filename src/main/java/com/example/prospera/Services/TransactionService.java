@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.time.YearMonth;
 import java.time.ZoneId;
 import java.util.List;
 
@@ -42,7 +43,10 @@ public class TransactionService {
         if (accountId != null) {
             accountService.findUserAccount(user.getId(), accountId);
         }
-        return transactionRepository.findByFilters(user.getId(), month, year, accountId, type);
+        YearMonth filterMonth = month == null ? null : YearMonth.of(year, month);
+        LocalDateTime from = filterMonth == null ? null : filterMonth.atDay(1).atStartOfDay();
+        LocalDateTime to = filterMonth == null ? null : filterMonth.plusMonths(1).atDay(1).atStartOfDay();
+        return transactionRepository.findByFilters(user.getId(), from, to, accountId, type);
     }
 
     public Transaction findAuthenticatedUserTransaction(Integer id) {
@@ -124,7 +128,9 @@ public class TransactionService {
     }
 
     public BigDecimal sumByType(Integer userId, TransactionType type, Integer month, Integer year) {
-        BigDecimal total = transactionRepository.sumByUserIdTypeAndMonth(userId, type, month, year);
+        YearMonth filterMonth = YearMonth.of(year, month);
+        BigDecimal total = transactionRepository.sumByUserIdTypeAndDateRange(userId, type,
+                filterMonth.atDay(1).atStartOfDay(), filterMonth.plusMonths(1).atDay(1).atStartOfDay());
         return total == null ? BigDecimal.ZERO : total;
     }
 

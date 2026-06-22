@@ -20,6 +20,8 @@ import java.time.ZoneId;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -45,8 +47,10 @@ class AlertServiceTest {
         mockUser();
         Card card = card(10, "Nubank", BigDecimal.valueOf(1000), 25);
         when(cardRepository.findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(1)).thenReturn(List.of(card));
-        when(installmentRepository.sumCardStatement(1, 10, 6, 2026)).thenReturn(BigDecimal.valueOf(800));
-        when(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(1, 10, 6, 2026)).thenReturn(BigDecimal.ZERO);
+        when(installmentRepository.sumCardStatementsByCardInDueDateRange(eq(1), any(), any()))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.valueOf(800)}));
+        when(cardPaymentRepository.sumByCardForUserIdAndMonthYear(1, 6, 2026))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.ZERO}));
         when(budgetService.getProgress(1, 6, 2026)).thenReturn(List.of());
         when(accountRepository.findByUserIdAndActiveTrueOrderByNameAsc(1)).thenReturn(List.of());
 
@@ -64,8 +68,10 @@ class AlertServiceTest {
         mockUser();
         Card card = card(10, "Nubank", BigDecimal.valueOf(1000), 25);
         when(cardRepository.findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(1)).thenReturn(List.of(card));
-        when(installmentRepository.sumCardStatement(1, 10, 6, 2026)).thenReturn(BigDecimal.valueOf(799));
-        when(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(1, 10, 6, 2026)).thenReturn(BigDecimal.ZERO);
+        when(installmentRepository.sumCardStatementsByCardInDueDateRange(eq(1), any(), any()))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.valueOf(799)}));
+        when(cardPaymentRepository.sumByCardForUserIdAndMonthYear(1, 6, 2026))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.ZERO}));
         when(budgetService.getProgress(1, 6, 2026)).thenReturn(List.of());
         when(accountRepository.findByUserIdAndActiveTrueOrderByNameAsc(1)).thenReturn(List.of());
 
@@ -102,10 +108,12 @@ class AlertServiceTest {
         Card paidCard = card(11, "Paid Card", BigDecimal.valueOf(1000), 20);
         when(cardRepository.findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(1))
                 .thenReturn(List.of(dueInsideWindow, paidCard));
-        when(installmentRepository.sumCardStatement(1, 10, 6, 2026)).thenReturn(BigDecimal.valueOf(300));
-        when(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(1, 10, 6, 2026)).thenReturn(BigDecimal.valueOf(100));
-        when(installmentRepository.sumCardStatement(1, 11, 6, 2026)).thenReturn(BigDecimal.valueOf(300));
-        when(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(1, 11, 6, 2026)).thenReturn(BigDecimal.valueOf(300));
+        when(installmentRepository.sumCardStatementsByCardInDueDateRange(eq(1), any(), any()))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.valueOf(300)},
+                        new Object[]{11, BigDecimal.valueOf(300)}));
+        when(cardPaymentRepository.sumByCardForUserIdAndMonthYear(1, 6, 2026))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.valueOf(100)},
+                        new Object[]{11, BigDecimal.valueOf(300)}));
         when(budgetService.getProgress(1, 6, 2026)).thenReturn(List.of());
         when(accountRepository.findByUserIdAndActiveTrueOrderByNameAsc(1)).thenReturn(List.of());
 
@@ -122,8 +130,10 @@ class AlertServiceTest {
         mockUser();
         Card card = card(10, "Nubank", BigDecimal.valueOf(1000), 10);
         when(cardRepository.findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(1)).thenReturn(List.of(card));
-        when(installmentRepository.sumCardStatement(1, 10, 6, 2026)).thenReturn(BigDecimal.valueOf(300));
-        when(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(1, 10, 6, 2026)).thenReturn(BigDecimal.valueOf(50));
+        when(installmentRepository.sumCardStatementsByCardInDueDateRange(eq(1), any(), any()))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.valueOf(300)}));
+        when(cardPaymentRepository.sumByCardForUserIdAndMonthYear(1, 6, 2026))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.valueOf(50)}));
         when(budgetService.getProgress(1, 6, 2026)).thenReturn(List.of());
         when(accountRepository.findByUserIdAndActiveTrueOrderByNameAsc(1)).thenReturn(List.of());
 
@@ -158,8 +168,10 @@ class AlertServiceTest {
         mockUser();
         Card card = card(10, "Nubank", BigDecimal.valueOf(1000), 20);
         when(cardRepository.findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(1)).thenReturn(List.of(card));
-        when(installmentRepository.sumCardStatement(1, 10, 6, 2026)).thenReturn(BigDecimal.valueOf(200));
-        when(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(1, 10, 6, 2026)).thenReturn(BigDecimal.ZERO);
+        when(installmentRepository.sumCardStatementsByCardInDueDateRange(eq(1), any(), any()))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.valueOf(200)}));
+        when(cardPaymentRepository.sumByCardForUserIdAndMonthYear(1, 6, 2026))
+                .thenReturn(List.<Object[]>of(new Object[]{10, BigDecimal.ZERO}));
         when(budgetService.getProgress(1, 6, 2026)).thenReturn(List.of());
         when(accountRepository.findByUserIdAndActiveTrueOrderByNameAsc(1)).thenReturn(List.of());
 

@@ -7,6 +7,7 @@ import org.springframework.stereotype.Repository;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.List;
 
 @Repository
@@ -32,8 +33,8 @@ public interface ExpenseRepository extends JpaRepository<Expense, Integer> {
 
     @Query("SELECT e FROM Expense e WHERE e.userId = :userId " +
             "AND (:cardId IS NULL OR e.cardId = :cardId) " +
-            "AND (:month IS NULL OR MONTH(e.purchaseDate) = :month) " +
-            "AND (:year IS NULL OR YEAR(e.purchaseDate) = :year)")
-    List<Expense> findByFilters(@Param("userId") Integer userId, @Param("month") Integer month,
-                                @Param("year") Integer year, @Param("cardId") Integer cardId);
+            "AND (:from IS NULL OR e.purchaseDate >= :from) " +
+            "AND (:to IS NULL OR e.purchaseDate < :to)")
+    List<Expense> findByFilters(@Param("userId") Integer userId, @Param("from") LocalDateTime from,
+                                @Param("to") LocalDateTime to, @Param("cardId") Integer cardId);
 }

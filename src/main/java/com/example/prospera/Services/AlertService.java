@@ -16,7 +16,9 @@ import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 public class AlertService {
@@ -102,9 +104,15 @@ public class AlertService {
     private List<AlertRecord> getCardAlerts(Integer userId, Integer month, Integer year, LocalDate today,
                                             LocalDate windowStart, LocalDate windowEnd) {
         List<AlertRecord> alerts = new ArrayList<>();
+        YearMonth statementMonth = YearMonth.of(year, month);
+        Map<Integer, BigDecimal> totalsByCard = totalsByCard(installmentRepository
+                .sumCardStatementsByCardInDueDateRange(userId, statementMonth.atDay(1),
+                        statementMonth.plusMonths(1).atDay(1)));
+        Map<Integer, BigDecimal> paymentsByCard = totalsByCard(
+                cardPaymentRepository.sumByCardForUserIdAndMonthYear(userId, month, year));
         for (Card card : cardRepository.findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(userId)) {
-            BigDecimal total = zeroIfNull(installmentRepository.sumCardStatement(userId, card.getId(), month, year));
-            BigDecimal paid = zeroIfNull(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(userId, card.getId(), month, year));
+            BigDecimal total = totalsByCard.getOrDefault(card.getId(), BigDecimal.ZERO);
+            BigDecimal paid = paymentsByCard.getOrDefault(card.getId(), BigDecimal.ZERO);
             BigDecimal remaining = total.subtract(paid);
             addCardLimitAlert(alerts, card, total, month, year);
             addCardBillAlert(alerts, card, remaining, month, year, today, windowStart, windowEnd);
@@ -222,5 +230,16 @@ public class AlertService {
 
     private int severityRank(AlertSeverity severity) {
         return severity == AlertSeverity.CRITICAL ? 0 : 1;
+    }
+
+    private Map<Integer, BigDecimal> totalsByCard(List<Object[]> rows) {
+        Map<Integer, BigDecimal> totals = new HashMap<>();
+        if (rows == null) {
+            return totals;
+        }
+        for (Object[] row : rows) {
+            totals.put((Integer) row[0], zeroIfNull((BigDecimal) row[1]));
+        }
+        return totals;
     }
 }

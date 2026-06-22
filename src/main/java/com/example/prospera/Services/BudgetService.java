@@ -12,6 +12,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 @Transactional
@@ -87,14 +89,23 @@ public class BudgetService {
 
     public List<BudgetProgressRecord> getProgress(Integer userId, Integer month, Integer year) {
         Map<Integer, BigDecimal> spending = spendingInsightService.getSpendingByCategory(userId, month, year);
-        return budgetRepository.findByUserIdAndActiveTrueAndMonthAndYearOrderByCategoryIdAsc(userId, month, year)
+        List<Budget> budgets = budgetRepository.findByUserIdAndActiveTrueAndMonthAndYearOrderByCategoryIdAsc(userId,
+                month, year);
+        Map<Integer, Category> categoriesById = categoryService.findUserCategories(userId, budgets.stream()
+                        .map(Budget::getCategoryId)
+                        .toList())
                 .stream()
-                .map(budget -> toProgress(userId, budget, spending.getOrDefault(budget.getCategoryId(), BigDecimal.ZERO)))
+                .collect(Collectors.toMap(Category::getId, Function.identity()));
+        return budgets.stream()
+                .map(budget -> toProgress(budget, categoriesById.get(budget.getCategoryId()),
+                        spending.getOrDefault(budget.getCategoryId(), BigDecimal.ZERO)))
                 .toList();
     }
 
-    private BudgetProgressRecord toProgress(Integer userId, Budget budget, BigDecimal spentAmount) {
-        Category category = categoryService.findUserCategory(userId, budget.getCategoryId());
+    private BudgetProgressRecord toProgress(Budget budget, Category category, BigDecimal spentAmount) {
+        if (category == null) {
+            throw new ObjectNotFoundException("Category not found with id: " + budget.getCategoryId());
+        }
         BigDecimal remainingAmount = budget.getAmount().subtract(spentAmount);
         BigDecimal percentUsed = spentAmount.multiply(BigDecimal.valueOf(100))
                 .divide(budget.getAmount(), 2, RoundingMode.HALF_UP);

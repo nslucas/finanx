@@ -15,9 +15,10 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.math.BigDecimal;
 import java.util.List;
-import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.when;
 
 @ExtendWith(MockitoExtension.class)
@@ -35,12 +36,13 @@ class SpendingInsightServiceTest {
     void categorySummaryCombinesAccountExpensesAndCardInstallments() {
         User user = new User(1, "Lucas", "Nunes", BigDecimal.valueOf(1000), "lucas@test.com");
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(user);
-        when(transactionRepository.sumExpenseTransactionsByCategory(1, 6, 2026, TransactionType.EXPENSE))
+        when(transactionRepository.sumExpenseTransactionsByCategoryInDateRange(eq(1), any(), any(),
+                eq(TransactionType.EXPENSE)))
                 .thenReturn(List.<Object[]>of(new Object[]{50, BigDecimal.valueOf(70)}));
-        when(installmentRepository.sumCardStatementInstallmentsByCategory(1, 6, 2026))
+        when(installmentRepository.sumCardStatementInstallmentsByCategoryInDueDateRange(eq(1), any(), any()))
                 .thenReturn(List.<Object[]>of(new Object[]{50, BigDecimal.valueOf(30)}, new Object[]{null, BigDecimal.valueOf(10)}));
-        when(categoryRepository.findByIdAndUserId(50, 1))
-                .thenReturn(Optional.of(new Category(50, "Groceries", CategoryType.EXPENSE, true, 1)));
+        when(categoryRepository.findByUserIdAndIdIn(eq(1), any()))
+                .thenReturn(List.of(new Category(50, "Groceries", CategoryType.EXPENSE, true, 1)));
 
         SpendingInsightService service = new SpendingInsightService(authenticatedUserService, transactionRepository,
                 installmentRepository, categoryRepository);

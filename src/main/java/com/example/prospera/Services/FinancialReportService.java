@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
 
@@ -115,8 +116,14 @@ public class FinancialReportService {
     public List<CardMonthlySummaryRecord> getCardsSummary(Integer month, Integer year) {
         validateMonthYear(month, year);
         User user = authenticatedUserService.getAuthenticatedUser();
+        YearMonth statementMonth = YearMonth.of(year, month);
+        Map<Integer, BigDecimal> statementTotalsByCard = totalsByCard(
+                installmentRepository.sumCardStatementsByCardInDueDateRange(user.getId(), statementMonth.atDay(1),
+                        statementMonth.plusMonths(1).atDay(1)));
+        Map<Integer, BigDecimal> paymentsByCard = totalsByCard(
+                cardPaymentRepository.sumByCardForUserIdAndMonthYear(user.getId(), month, year));
         return cardRepository.findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(user.getId()).stream()
-                .map(card -> toCardSummary(user.getId(), card, month, year))
+                .map(card -> toCardSummary(card, month, year, statementTotalsByCard, paymentsByCard))
                 .toList();
     }
 
@@ -139,16 +146,21 @@ public class FinancialReportService {
         YearMonth cursor = YearMonth.from(from);
         YearMonth end = YearMonth.from(to);
         List<Card> cards = cardRepository.findByUserIdAndActiveTrueOrderByBankNameAscNameAsc(userId);
+        Map<CardMonthKey, BigDecimal> totalsByCardMonth = totalsByCardMonth(
+                installmentRepository.sumCardStatementsByCardAndDueMonthInRange(userId, cursor.atDay(1),
+                        end.plusMonths(1).atDay(1)));
+        Map<CardMonthKey, BigDecimal> paymentsByCardMonth = totalsByCardMonth(
+                cardPaymentRepository.sumByCardAndMonthYearInRange(userId, cursor.getMonthValue(), cursor.getYear(),
+                        end.getMonthValue(), end.getYear()));
         while (!cursor.isAfter(end)) {
             for (Card card : cards) {
                 LocalDate dueDate = CardBillingCycleCalculator.atConfiguredDay(cursor, card.getDueDay());
                 if (dueDate.isBefore(from) || dueDate.isAfter(to)) {
                     continue;
                 }
-                BigDecimal total = zeroIfNull(installmentRepository.sumCardStatement(userId, card.getId(),
-                        cursor.getMonthValue(), cursor.getYear()));
-                BigDecimal paid = zeroIfNull(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(userId, card.getId(),
-                        cursor.getMonthValue(), cursor.getYear()));
+                CardMonthKey key = new CardMonthKey(card.getId(), cursor.getMonthValue(), cursor.getYear());
+                BigDecimal total = totalsByCardMonth.getOrDefault(key, BigDecimal.ZERO);
+                BigDecimal paid = paymentsByCardMonth.getOrDefault(key, BigDecimal.ZERO);
                 BigDecimal remaining = total.subtract(paid);
                 if (total.compareTo(BigDecimal.ZERO) > 0 || remaining.compareTo(BigDecimal.ZERO) > 0) {
                     statements.add(new UpcomingCardStatementRecord(card.getId(), card.getName(),
@@ -209,9 +221,11 @@ public class FinancialReportService {
         }
     }
 
-    private CardMonthlySummaryRecord toCardSummary(Integer userId, Card card, Integer month, Integer year) {
-        BigDecimal total = zeroIfNull(installmentRepository.sumCardStatement(userId, card.getId(), month, year));
-        BigDecimal paid = zeroIfNull(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(userId, card.getId(), month, year));
+    private CardMonthlySummaryRecord toCardSummary(Card card, Integer month, Integer year,
+                                                   Map<Integer, BigDecimal> statementTotalsByCard,
+                                                   Map<Integer, BigDecimal> paymentsByCard) {
+        BigDecimal total = statementTotalsByCard.getOrDefault(card.getId(), BigDecimal.ZERO);
+        BigDecimal paid = paymentsByCard.getOrDefault(card.getId(), BigDecimal.ZERO);
         BigDecimal remaining = total.subtract(paid);
         return new CardMonthlySummaryRecord(card.getId(), card.getName(), month, year, total, paid, remaining,
                 CardStatementService.resolveStatus(total, paid));
@@ -227,7 +241,10 @@ public class FinancialReportService {
     }
 
     private BigDecimal sumByType(Integer userId, TransactionType type, Integer month, Integer year) {
-        return zeroIfNull(transactionRepository.sumByUserIdTypeAndMonth(userId, type, month, year));
+        YearMonth filterMonth = YearMonth.of(year, month);
+        LocalDateTime from = filterMonth.atDay(1).atStartOfDay();
+        LocalDateTime to = filterMonth.plusMonths(1).atDay(1).atStartOfDay();
+        return zeroIfNull(transactionRepository.sumByUserIdTypeAndDateRange(userId, type, from, to));
     }
 
     private void validateRange(LocalDate from, LocalDate to) {
@@ -256,9 +273,35 @@ public class FinancialReportService {
         return value == null ? BigDecimal.ZERO : value;
     }
 
+    private Map<Integer, BigDecimal> totalsByCard(List<Object[]> rows) {
+        Map<Integer, BigDecimal> totals = new HashMap<>();
+        if (rows == null) {
+            return totals;
+        }
+        for (Object[] row : rows) {
+            totals.put((Integer) row[0], zeroIfNull((BigDecimal) row[1]));
+        }
+        return totals;
+    }
+
+    private Map<CardMonthKey, BigDecimal> totalsByCardMonth(List<Object[]> rows) {
+        Map<CardMonthKey, BigDecimal> totals = new HashMap<>();
+        if (rows == null) {
+            return totals;
+        }
+        for (Object[] row : rows) {
+            totals.put(new CardMonthKey((Integer) row[0], ((Number) row[2]).intValue(), ((Number) row[1]).intValue()),
+                    zeroIfNull((BigDecimal) row[3]));
+        }
+        return totals;
+    }
+
     private static class ForecastAccumulator {
         private BigDecimal income = BigDecimal.ZERO;
         private BigDecimal accountExpense = BigDecimal.ZERO;
         private BigDecimal cardExpense = BigDecimal.ZERO;
+    }
+
+    private record CardMonthKey(Integer cardId, Integer month, Integer year) {
     }
 }

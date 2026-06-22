@@ -52,8 +52,8 @@ class BudgetServiceTest {
                 .thenReturn(Map.of(50, BigDecimal.valueOf(80)));
         when(budgetRepository.findByUserIdAndActiveTrueAndMonthAndYearOrderByCategoryIdAsc(1, 6, 2026))
                 .thenReturn(List.of(budget));
-        when(categoryService.findUserCategory(1, 50))
-                .thenReturn(new Category(50, "Groceries", CategoryType.EXPENSE, true, 1));
+        when(categoryService.findUserCategories(1, List.of(50)))
+                .thenReturn(List.of(new Category(50, "Groceries", CategoryType.EXPENSE, true, 1)));
 
         BudgetService service = new BudgetService(budgetRepository, authenticatedUserService, categoryService,
                 spendingInsightService);

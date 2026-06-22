@@ -12,8 +12,12 @@ import com.example.prospera.repositories.TransactionRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.YearMonth;
 import java.util.*;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Service
 public class SpendingInsightService {
@@ -67,38 +71,61 @@ public class SpendingInsightService {
 
     public Map<Integer, BigDecimal> getSpendingByCategory(Integer userId, Integer month, Integer year) {
         Map<Integer, BigDecimal> totals = new HashMap<>();
-        mergeGroupedTotals(totals, transactionRepository.sumExpenseTransactionsByCategory(userId, month, year,
-                TransactionType.EXPENSE));
-        mergeGroupedTotals(totals, installmentRepository.sumCardStatementInstallmentsByCategory(userId, month, year));
+        YearMonth filterMonth = YearMonth.of(year, month);
+        LocalDateTime fromDateTime = filterMonth.atDay(1).atStartOfDay();
+        LocalDateTime toDateTime = filterMonth.plusMonths(1).atDay(1).atStartOfDay();
+        LocalDate fromDate = filterMonth.atDay(1);
+        LocalDate toDate = filterMonth.plusMonths(1).atDay(1);
+        mergeGroupedTotals(totals, transactionRepository.sumExpenseTransactionsByCategoryInDateRange(userId,
+                fromDateTime, toDateTime, TransactionType.EXPENSE));
+        mergeGroupedTotals(totals, installmentRepository.sumCardStatementInstallmentsByCategoryInDueDateRange(userId,
+                fromDate, toDate));
         return totals;
     }
 
     private List<CategorySummaryRecord> toCategorySummary(Integer userId, Map<Integer, BigDecimal> totals) {
+        Map<Integer, Category> categoriesById = findCategoriesById(userId, totals.keySet());
         return totals.entrySet().stream()
-                .sorted(Comparator.comparing(entry -> categorySortName(userId, entry.getKey())))
-                .map(entry -> toCategorySummaryRecord(userId, entry.getKey(), entry.getValue()))
+                .sorted(Comparator.comparing(entry -> categorySortName(categoriesById, entry.getKey())))
+                .map(entry -> toCategorySummaryRecord(categoriesById, entry.getKey(), entry.getValue()))
                 .toList();
     }
 
-    private CategorySummaryRecord toCategorySummaryRecord(Integer userId, Integer categoryId, BigDecimal amount) {
+    private CategorySummaryRecord toCategorySummaryRecord(Map<Integer, Category> categoriesById, Integer categoryId,
+                                                          BigDecimal amount) {
         if (categoryId == null) {
             return new CategorySummaryRecord(null, "Uncategorized", CategoryType.EXPENSE, amount);
         }
-        Optional<Category> category = categoryRepository.findByIdAndUserId(categoryId, userId);
-        return category.map(value -> new CategorySummaryRecord(value.getId(), value.getName(), value.getType(), amount))
-                .orElseGet(() -> new CategorySummaryRecord(categoryId, "Unknown category", CategoryType.EXPENSE, amount));
+        Category category = categoriesById.get(categoryId);
+        if (category == null) {
+            return new CategorySummaryRecord(categoryId, "Unknown category", CategoryType.EXPENSE, amount);
+        }
+        return new CategorySummaryRecord(category.getId(), category.getName(), category.getType(), amount);
     }
 
-    private String categorySortName(Integer userId, Integer categoryId) {
+    private String categorySortName(Map<Integer, Category> categoriesById, Integer categoryId) {
         if (categoryId == null) {
             return "zzzz_uncategorized";
         }
-        return categoryRepository.findByIdAndUserId(categoryId, userId)
-                .map(Category::getName)
-                .orElse("zzzz_unknown");
+        Category category = categoriesById.get(categoryId);
+        return category == null ? "zzzz_unknown" : category.getName();
+    }
+
+    private Map<Integer, Category> findCategoriesById(Integer userId, Set<Integer> categoryIds) {
+        List<Integer> ids = categoryIds.stream()
+                .filter(Objects::nonNull)
+                .toList();
+        if (ids.isEmpty()) {
+            return Map.of();
+        }
+        return categoryRepository.findByUserIdAndIdIn(userId, ids).stream()
+                .collect(Collectors.toMap(Category::getId, Function.identity()));
     }
 
     private void mergeGroupedTotals(Map<Integer, BigDecimal> totals, List<Object[]> groupedTotals) {
+        if (groupedTotals == null) {
+            return;
+        }
         for (Object[] row : groupedTotals) {
             Integer categoryId = (Integer) row[0];
             BigDecimal amount = zeroIfNull((BigDecimal) row[1]);
@@ -107,7 +134,9 @@ public class SpendingInsightService {
     }
 
     private BigDecimal sumByType(Integer userId, TransactionType type, Integer month, Integer year) {
-        return zeroIfNull(transactionRepository.sumByUserIdTypeAndMonth(userId, type, month, year));
+        YearMonth filterMonth = YearMonth.of(year, month);
+        return zeroIfNull(transactionRepository.sumByUserIdTypeAndDateRange(userId, type,
+                filterMonth.atDay(1).atStartOfDay(), filterMonth.plusMonths(1).atDay(1).atStartOfDay()));
     }
 
     private void validateMonthYear(Integer month, Integer year) {

@@ -70,6 +70,10 @@ public class CardPaymentService {
         return total == null ? BigDecimal.ZERO : total;
     }
 
+    public List<Object[]> getPaidAmountsByCard(Integer userId, Integer month, Integer year) {
+        return cardPaymentRepository.sumByCardForUserIdAndMonthYear(userId, month, year);
+    }
+
     private void validate(CardPaymentRecord record) {
         if (record.accountId() == null) {
             throw new IllegalArgumentException("Account id is required");

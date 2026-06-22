@@ -53,7 +53,10 @@ public class ExpenseService {
         if (cardId != null) {
             cardService.findUserCard(user.getId(), cardId);
         }
-        return expenseRepository.findByFilters(user.getId(), month, year, cardId);
+        YearMonth filterMonth = month == null ? null : YearMonth.of(year, month);
+        LocalDateTime from = filterMonth == null ? null : filterMonth.atDay(1).atStartOfDay();
+        LocalDateTime to = filterMonth == null ? null : filterMonth.plusMonths(1).atDay(1).atStartOfDay();
+        return expenseRepository.findByFilters(user.getId(), from, to, cardId);
     }
 
     public Expense getExpenseById(Integer id) {

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.time.LocalDate;
 import java.util.List;
 
 public interface ExpenseInstallmentRepository extends JpaRepository <ExpenseInstallment, ExpenseInstallmentId> {
@@ -53,9 +54,26 @@ public interface ExpenseInstallmentRepository extends JpaRepository <ExpenseInst
 
     @Query("SELECT e.categoryId, SUM(i.installmentAmount) FROM ExpenseInstallment i, Expense e " +
             "WHERE i.id.expenseId = e.id AND e.userId = :userId AND e.cardId IS NOT NULL " +
-            "AND MONTH(i.dueDate) = :month AND YEAR(i.dueDate) = :year " +
+            "AND i.dueDate >= :from AND i.dueDate < :to " +
             "GROUP BY e.categoryId")
-    List<Object[]> sumCardStatementInstallmentsByCategory(@Param("userId") Integer userId,
-                                                          @Param("month") Integer month,
-                                                          @Param("year") Integer year);
+    List<Object[]> sumCardStatementInstallmentsByCategoryInDueDateRange(@Param("userId") Integer userId,
+                                                                        @Param("from") LocalDate from,
+                                                                        @Param("to") LocalDate to);
+
+    @Query("SELECT e.cardId, SUM(i.installmentAmount) FROM ExpenseInstallment i, Expense e " +
+            "WHERE i.id.expenseId = e.id AND e.userId = :userId AND e.cardId IS NOT NULL " +
+            "AND i.dueDate >= :from AND i.dueDate < :to " +
+            "GROUP BY e.cardId")
+    List<Object[]> sumCardStatementsByCardInDueDateRange(@Param("userId") Integer userId,
+                                                         @Param("from") LocalDate from,
+                                                         @Param("to") LocalDate to);
+
+    @Query("SELECT e.cardId, YEAR(i.dueDate), MONTH(i.dueDate), SUM(i.installmentAmount) " +
+            "FROM ExpenseInstallment i, Expense e " +
+            "WHERE i.id.expenseId = e.id AND e.userId = :userId AND e.cardId IS NOT NULL " +
+            "AND i.dueDate >= :from AND i.dueDate < :to " +
+            "GROUP BY e.cardId, YEAR(i.dueDate), MONTH(i.dueDate)")
+    List<Object[]> sumCardStatementsByCardAndDueMonthInRange(@Param("userId") Integer userId,
+                                                             @Param("from") LocalDate from,
+                                                             @Param("to") LocalDate to);
 }
