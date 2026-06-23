@@ -147,7 +147,11 @@ public class ExpenseService {
 
     public void delete(Integer id) {
         User user = authenticatedUserService.getAuthenticatedUser();
-        Expense expense = findOwnedExpense(user.getId(), id);
+        deleteRecurringExpense(user.getId(), id);
+    }
+
+    public void deleteRecurringExpense(Integer userId, Integer expenseId) {
+        Expense expense = findOwnedExpense(userId, expenseId);
         installmentService.deleteByExpenseId(expense.getId());
         expenseRepository.deleteById(expense.getId());
     }

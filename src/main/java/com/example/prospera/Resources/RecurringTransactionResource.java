@@ -84,4 +84,12 @@ public class RecurringTransactionResource {
         RecurringTransaction recurrence = service.findAuthenticatedUserRecurrence(id);
         return ResponseEntity.ok(new RecurringOccurrenceRecord(recurrence, occurrence, occurrence.getOccurrenceDate()));
     }
+
+    @PostMapping("/{id}/occurrences/revert")
+    public ResponseEntity<RecurringOccurrenceRecord> revert(@PathVariable Integer id,
+                                                            @RequestBody RecurringOccurrenceRequest request) {
+        RecurringOccurrence occurrence = service.revert(id, request);
+        RecurringTransaction recurrence = service.findAuthenticatedUserRecurrence(id);
+        return ResponseEntity.ok(new RecurringOccurrenceRecord(recurrence, occurrence, occurrence.getOccurrenceDate()));
+    }
 }

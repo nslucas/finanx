@@ -184,6 +184,32 @@ public class RecurringTransactionService {
         return occurrenceRepository.save(occurrence);
     }
 
+    public RecurringOccurrence revert(Integer recurrenceId, RecurringOccurrenceRequest request) {
+        LocalDate occurrenceDate = requireOccurrenceDate(request);
+        User user = authenticatedUserService.getAuthenticatedUser();
+        RecurringTransaction recurrence = findUserRecurrence(user.getId(), recurrenceId);
+        validateOccurrenceDateInSchedule(recurrence, occurrenceDate);
+
+        RecurringOccurrence occurrence = occurrenceRepository
+                .findByRecurrenceIdAndOccurrenceDate(recurrence.getId(), occurrenceDate)
+                .orElseThrow(() -> new IllegalArgumentException("Only materialized occurrences can be reverted"));
+        if (occurrence.getStatus() != RecurringOccurrenceStatus.MATERIALIZED) {
+            throw new IllegalArgumentException("Only materialized occurrences can be reverted");
+        }
+
+        if (occurrence.getTransactionId() != null) {
+            transactionService.deleteRecurringTransaction(user.getId(), occurrence.getTransactionId());
+        }
+        if (occurrence.getExpenseId() != null) {
+            expenseService.deleteRecurringExpense(user.getId(), occurrence.getExpenseId());
+        }
+
+        occurrence.setTransactionId(null);
+        occurrence.setExpenseId(null);
+        occurrence.setStatus(RecurringOccurrenceStatus.PENDING);
+        return occurrenceRepository.save(occurrence);
+    }
+
     public List<LocalDate> generateOccurrenceDates(RecurringTransaction recurrence, LocalDate from, LocalDate to) {
         validateRange(from, to);
         List<LocalDate> dates = new ArrayList<>();
@@ -236,6 +262,10 @@ public class RecurringTransactionService {
         if (!Boolean.TRUE.equals(recurrence.getActive())) {
             throw new IllegalArgumentException("Recurring transaction is inactive");
         }
+        validateOccurrenceDateInSchedule(recurrence, occurrenceDate);
+    }
+
+    private void validateOccurrenceDateInSchedule(RecurringTransaction recurrence, LocalDate occurrenceDate) {
         if (!generateOccurrenceDates(recurrence, occurrenceDate, occurrenceDate).contains(occurrenceDate)) {
             throw new IllegalArgumentException("Occurrence date is outside the recurrence schedule");
         }

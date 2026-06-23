@@ -112,6 +112,15 @@ public class TransactionService {
         return post(userId, accountId, type, amount, occurredAt, description, null, categoryId, true);
     }
 
+    public void deleteRecurringTransaction(Integer userId, Integer transactionId) {
+        Transaction transaction = findUserTransaction(userId, transactionId);
+        if (transaction.getType() != TransactionType.INCOME && transaction.getType() != TransactionType.EXPENSE) {
+            throw new IllegalArgumentException("Recurring account transactions must be income or expense");
+        }
+        reverseBalanceEffect(transaction);
+        transactionRepository.delete(transaction);
+    }
+
     public void createTransfer(Integer sourceAccountId, TransferRecord record) {
         if (record == null) {
             throw new IllegalArgumentException("Transfer body is required");
