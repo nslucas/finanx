@@ -212,6 +212,8 @@ Endpoints:
 - `GET /cards/{cardId}/statements/current`
 - `POST /cards/{cardId}/payments`
 - `GET /cards/{cardId}/payments?month=&year=`
+- `PUT /cards/{cardId}/payments/{paymentId}`
+- `DELETE /cards/{cardId}/payments/{paymentId}`
 
 Create/update request:
 
@@ -259,6 +261,22 @@ Payment request:
 }
 ```
 
+Payment response/list item:
+
+```json
+{
+  "id": 10,
+  "cardId": 2,
+  "accountId": 1,
+  "month": 6,
+  "year": 2026,
+  "amount": 300,
+  "paymentDate": "2026-06-08",
+  "description": "Pagamento Nubank",
+  "transactionId": 55
+}
+```
+
 Particularities:
 
 - The API stores safe card metadata only. Never send full card numbers.
@@ -267,8 +285,11 @@ Particularities:
 - `DELETE /cards/{id}` soft-deactivates the card.
 - Statements are derived from expense installments and card payments; there is no persisted statement row.
 - A card payment creates a `CARD_PAYMENT` transaction and subtracts from the source account.
+- Updating a card payment preserves `transactionId`, updates the related `CARD_PAYMENT` transaction, and recalculates account balance impact if `accountId` or `amount` changes.
+- Deleting a card payment reverses its balance impact, removes the payment, removes its related `CARD_PAYMENT` transaction, and returns `204 No Content`.
 - Card payment amount must be positive and source account must have sufficient balance.
 - Overpaying a statement is allowed if account balance is sufficient; statement status becomes `OVERPAID`.
+- `CARD_PAYMENT` transactions cannot be deleted directly through `DELETE /transactions/{transactionId}`; use `DELETE /cards/{cardId}/payments/{paymentId}`.
 
 ## Expenses
 

@@ -2,6 +2,7 @@ package com.example.prospera.Services;
 
 import com.example.prospera.DTO.CardPaymentRecord;
 import com.example.prospera.Entities.*;
+import com.example.prospera.Exceptions.ObjectNotFoundException;
 import com.example.prospera.repositories.CardPaymentRepository;
 import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
@@ -52,6 +53,41 @@ public class CardPaymentService {
         return cardPaymentRepository.save(payment);
     }
 
+    public CardPayment update(Integer cardId, Integer paymentId, CardPaymentRecord record) {
+        if (record == null) {
+            throw new IllegalArgumentException("Payment body is required");
+        }
+        User user = authenticatedUserService.getAuthenticatedUser();
+        validate(record);
+        cardService.findUserCard(user.getId(), cardId);
+        CardPayment payment = findUserCardPayment(user.getId(), cardId, paymentId);
+        Account account = accountService.findUserAccount(user.getId(), record.accountId());
+        accountService.ensureActive(account);
+
+        LocalDate paymentDate = record.paymentDate() == null ? LocalDate.now() : record.paymentDate();
+        transactionService.updateCardPaymentTransaction(user.getId(), payment.getTransactionId(), account.getId(),
+                record.amount(), LocalDateTime.of(paymentDate, LocalTime.NOON), record.description());
+
+        payment.setAccountId(account.getId());
+        payment.setMonth(record.month());
+        payment.setYear(record.year());
+        payment.setAmount(record.amount());
+        payment.setPaymentDate(paymentDate);
+        payment.setDescription(record.description());
+        return cardPaymentRepository.save(payment);
+    }
+
+    public void delete(Integer cardId, Integer paymentId) {
+        User user = authenticatedUserService.getAuthenticatedUser();
+        cardService.findUserCard(user.getId(), cardId);
+        CardPayment payment = findUserCardPayment(user.getId(), cardId, paymentId);
+
+        Transaction transaction = transactionService.reverseCardPaymentTransaction(user.getId(), payment.getTransactionId());
+        cardPaymentRepository.delete(payment);
+        cardPaymentRepository.flush();
+        transactionService.deleteReversedCardPaymentTransaction(user.getId(), transaction.getId());
+    }
+
     public List<CardPayment> findPayments(Integer cardId, Integer month, Integer year) {
         User user = authenticatedUserService.getAuthenticatedUser();
         validateMonthYear(month, year);
@@ -72,6 +108,11 @@ public class CardPaymentService {
 
     public List<Object[]> getPaidAmountsByCard(Integer userId, Integer month, Integer year) {
         return cardPaymentRepository.sumByCardForUserIdAndMonthYear(userId, month, year);
+    }
+
+    private CardPayment findUserCardPayment(Integer userId, Integer cardId, Integer paymentId) {
+        return cardPaymentRepository.findByIdAndUserIdAndCardId(paymentId, userId, cardId)
+                .orElseThrow(() -> new ObjectNotFoundException("Card payment not found with id: " + paymentId));
     }
 
     private void validate(CardPaymentRecord record) {

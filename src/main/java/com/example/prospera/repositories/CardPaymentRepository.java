@@ -7,8 +7,11 @@ import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Optional;
 
 public interface CardPaymentRepository extends JpaRepository<CardPayment, Integer> {
+    Optional<CardPayment> findByIdAndUserIdAndCardId(Integer id, Integer userId, Integer cardId);
+
     List<CardPayment> findByUserIdAndCardIdAndMonthAndYearOrderByPaymentDateAscIdAsc(Integer userId, Integer cardId,
                                                                                       Integer month, Integer year);
 

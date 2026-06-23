@@ -95,4 +95,18 @@ public class CardResource {
                 .toList();
         return ResponseEntity.ok(payments);
     }
+
+    @PutMapping("/{id}/payments/{paymentId}")
+    public ResponseEntity<CardPaymentRecord> updatePayment(@PathVariable Integer id,
+                                                           @PathVariable Integer paymentId,
+                                                           @RequestBody CardPaymentRecord record) {
+        CardPayment payment = paymentService.update(id, paymentId, record);
+        return ResponseEntity.ok(new CardPaymentRecord(payment));
+    }
+
+    @DeleteMapping("/{id}/payments/{paymentId}")
+    public ResponseEntity<Void> deletePayment(@PathVariable Integer id, @PathVariable Integer paymentId) {
+        paymentService.delete(id, paymentId);
+        return ResponseEntity.noContent().build();
+    }
 }

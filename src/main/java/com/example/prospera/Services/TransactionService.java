@@ -72,6 +72,37 @@ public class TransactionService {
         return post(userId, accountId, TransactionType.CARD_PAYMENT, amount, occurredAt, description, null, null, true);
     }
 
+    public Transaction updateCardPaymentTransaction(Integer userId, Integer transactionId, Integer accountId,
+                                                    BigDecimal amount, LocalDateTime occurredAt, String description) {
+        validateTransaction(TransactionType.CARD_PAYMENT, amount);
+        Account account = accountService.findUserAccount(userId, accountId);
+        accountService.ensureActive(account);
+        Transaction transaction = findUserTransaction(userId, transactionId);
+        requireCardPaymentTransaction(transaction);
+
+        reverseBalanceEffect(transaction);
+        accountService.applyDelta(userId, accountId, balanceDelta(TransactionType.CARD_PAYMENT, amount));
+
+        transaction.setAccountId(accountId);
+        transaction.setAmount(amount);
+        transaction.setOccurredAt(defaultOccurredAt(occurredAt));
+        transaction.setDescription(description);
+        return transactionRepository.save(transaction);
+    }
+
+    public Transaction reverseCardPaymentTransaction(Integer userId, Integer transactionId) {
+        Transaction transaction = findUserTransaction(userId, transactionId);
+        requireCardPaymentTransaction(transaction);
+        reverseBalanceEffect(transaction);
+        return transaction;
+    }
+
+    public void deleteReversedCardPaymentTransaction(Integer userId, Integer transactionId) {
+        Transaction transaction = findUserTransaction(userId, transactionId);
+        requireCardPaymentTransaction(transaction);
+        transactionRepository.delete(transaction);
+    }
+
     public Transaction createRecurringTransaction(Integer userId, Integer accountId, TransactionType type,
                                                   BigDecimal amount, LocalDateTime occurredAt, String description,
                                                   Integer categoryId) {
@@ -159,6 +190,12 @@ public class TransactionService {
     private Transaction findUserTransaction(Integer userId, Integer id) {
         return transactionRepository.findByIdAndUserId(id, userId)
                 .orElseThrow(() -> new ObjectNotFoundException("Transaction not found with id: " + id));
+    }
+
+    private void requireCardPaymentTransaction(Transaction transaction) {
+        if (transaction.getType() != TransactionType.CARD_PAYMENT) {
+            throw new IllegalArgumentException("Transaction is not a card payment");
+        }
     }
 
     private void reverseBalanceEffect(Transaction transaction) {
