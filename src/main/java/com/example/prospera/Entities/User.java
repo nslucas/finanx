@@ -20,6 +20,7 @@ public class User implements UserDetails {
     private BigDecimal monthLimit;
     private String email;
     private String password;
+    private String connectionCode;
     @Enumerated(EnumType.STRING)
     private UserRole role;
     @Transient
@@ -105,6 +106,14 @@ public class User implements UserDetails {
     }
 
     public void setPassword(String password){ this.password = password; }
+
+    public String getConnectionCode() {
+        return connectionCode;
+    }
+
+    public void setConnectionCode(String connectionCode) {
+        this.connectionCode = connectionCode;
+    }
 
     public List<Expense> getExpenses() {
         return expenses;

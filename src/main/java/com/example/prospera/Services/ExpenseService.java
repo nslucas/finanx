@@ -28,12 +28,13 @@ public class ExpenseService {
     private final AuthenticatedUserService authenticatedUserService;
     private final CardService cardService;
     private final CategoryService categoryService;
+    private final ExpenseShareService expenseShareService;
 
     public ExpenseService(ExpenseRepository expenseRepository, UserService userService,
                           ExpenseInstallmentService installmentService,
                           ExpenseInstallmentRepository installmentRepository,
                           AuthenticatedUserService authenticatedUserService, CardService cardService,
-                          CategoryService categoryService) {
+                          CategoryService categoryService, ExpenseShareService expenseShareService) {
         this.expenseRepository = expenseRepository;
         this.userService = userService;
         this.installmentService = installmentService;
@@ -41,6 +42,7 @@ public class ExpenseService {
         this.authenticatedUserService = authenticatedUserService;
         this.cardService = cardService;
         this.categoryService = categoryService;
+        this.expenseShareService = expenseShareService;
     }
 
     public List<Expense> getAllExpenses() {
@@ -101,6 +103,7 @@ public class ExpenseService {
 
         expenseRepository.save(expense);
         installmentService.generateInstallments(expense, card);
+        expenseShareService.createForExpense(user, expense, obj.share());
         return expense;
     }
 
@@ -139,6 +142,7 @@ public class ExpenseService {
         newObj.setCardId(obj.getCardId());
         newObj.setCategoryId(obj.getCategoryId());
         Expense saved = expenseRepository.save(newObj);
+        expenseShareService.updateForExpense(user, saved, objDTO.share());
 
         installmentService.deleteByExpenseId(saved.getId());
         installmentService.generateInstallments(saved, card);
@@ -152,6 +156,7 @@ public class ExpenseService {
 
     public void deleteRecurringExpense(Integer userId, Integer expenseId) {
         Expense expense = findOwnedExpense(userId, expenseId);
+        expenseShareService.deleteForExpense(expense.getId());
         installmentService.deleteByExpenseId(expense.getId());
         expenseRepository.deleteById(expense.getId());
     }

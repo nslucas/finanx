@@ -6,6 +6,7 @@ import com.example.prospera.DTO.RegisterDTO;
 import com.example.prospera.Entities.User;
 import com.example.prospera.Entities.UserRole;
 import com.example.prospera.Infra.Security.TokenService;
+import com.example.prospera.Services.UserService;
 import com.example.prospera.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -31,6 +32,8 @@ public class AuthenticationResource {
     UserRepository _repository;
     @Autowired
     private TokenService tokenService;
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/login")
     public ResponseEntity login(@RequestBody @Validated AuthenticationDTO data){
@@ -56,6 +59,7 @@ public class AuthenticationResource {
         String encryptedPassword = BCrypt.hashpw(data.password(), BCrypt.gensalt());
         UserRole role = data.role() == null ? UserRole.USER : data.role();
         User newUser = new User(data.name(), data.lastName(), data.monthLimit(), data.email(), encryptedPassword, role);
+        newUser.setConnectionCode(userService.generateUniqueConnectionCode());
 
         this._repository.save(newUser);
 

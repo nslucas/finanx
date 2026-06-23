@@ -7,11 +7,15 @@ import com.example.prospera.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
+    private static final String CONNECTION_CODE_CHARS = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    private static final int CONNECTION_CODE_LENGTH = 8;
+    private static final SecureRandom RANDOM = new SecureRandom();
 
     @Autowired
     private final UserRepository repository;
@@ -49,6 +53,22 @@ public class UserService {
 
     public User fromDTO(UserRecord objDTO){
         return new User(objDTO.name(), objDTO.lastName(), objDTO.monthLimit(), objDTO.email());
+    }
+
+    public String generateUniqueConnectionCode() {
+        String code;
+        do {
+            code = randomConnectionCode();
+        } while (repository.existsByConnectionCode(code));
+        return code;
+    }
+
+    private String randomConnectionCode() {
+        StringBuilder builder = new StringBuilder(CONNECTION_CODE_LENGTH);
+        for (int i = 0; i < CONNECTION_CODE_LENGTH; i++) {
+            builder.append(CONNECTION_CODE_CHARS.charAt(RANDOM.nextInt(CONNECTION_CODE_CHARS.length())));
+        }
+        return builder.toString();
     }
 
 }

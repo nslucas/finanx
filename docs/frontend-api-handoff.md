@@ -339,6 +339,7 @@ Particularities:
 - `amount` and `installmentCount` must be greater than zero.
 - Card expense installments follow card closing/due-day billing rules.
 - Updating an expense regenerates its installments.
+- Shared expenses can include an optional `share` object when the users have an accepted connection. See `docs/expense-sharing-frontend-handoff.md` for the full connection, shared-expense, and `Acertos` contract.
 
 Legacy compatibility endpoints:
 
