@@ -1,33 +1,28 @@
 package com.example.prospera.Services;
 
 import com.example.prospera.DTO.CardStatementResponse;
-import com.example.prospera.DTO.ExpenseInstallmentRecord;
 import com.example.prospera.Entities.*;
 import com.example.prospera.repositories.CardPaymentRepository;
 import com.example.prospera.repositories.ExpenseInstallmentRepository;
-import com.example.prospera.repositories.ExpenseRepository;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.time.YearMonth;
-import java.util.List;
 
 @Service
 public class CardStatementService {
     private final CardService cardService;
     private final AuthenticatedUserService authenticatedUserService;
     private final ExpenseInstallmentRepository installmentRepository;
-    private final ExpenseRepository expenseRepository;
     private final CardPaymentRepository cardPaymentRepository;
 
     public CardStatementService(CardService cardService, AuthenticatedUserService authenticatedUserService,
-                                ExpenseInstallmentRepository installmentRepository, ExpenseRepository expenseRepository,
+                                ExpenseInstallmentRepository installmentRepository,
                                 CardPaymentRepository cardPaymentRepository) {
         this.cardService = cardService;
         this.authenticatedUserService = authenticatedUserService;
         this.installmentRepository = installmentRepository;
-        this.expenseRepository = expenseRepository;
         this.cardPaymentRepository = cardPaymentRepository;
     }
 
@@ -36,17 +31,18 @@ public class CardStatementService {
         validateMonthYear(month, year);
 
         Card card = cardService.findUserCard(user.getId(), cardId);
-        List<ExpenseInstallment> installments = installmentRepository
-                .findCardStatementInstallments(user.getId(), cardId, month, year);
-        List<ExpenseInstallmentRecord> installmentRecords = installments.stream()
-                .map(installment -> new ExpenseInstallmentRecord(installment, findExpense(installment.getExpenseId())))
-                .toList();
+        YearMonth statementMonth = YearMonth.of(year, month);
+        LocalDate from = statementMonth.atDay(1);
+        LocalDate to = statementMonth.plusMonths(1).atDay(1);
 
-        BigDecimal totalAmount = zeroIfNull(installmentRepository.sumCardStatement(user.getId(), cardId, month, year));
+        var installmentRecords = installmentRepository.findCardStatementInstallmentRecords(
+                user.getId(), cardId, from, to);
+        BigDecimal totalAmount = zeroIfNull(installmentRepository.sumCardStatementInDueDateRange(
+                user.getId(), cardId, from, to));
         BigDecimal paidAmount = zeroIfNull(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(user.getId(), cardId, month, year));
         BigDecimal remainingAmount = totalAmount.subtract(paidAmount);
         BigDecimal availableLimit = card.getCreditLimit().subtract(totalAmount);
-        LocalDate dueDate = CardBillingCycleCalculator.atConfiguredDay(YearMonth.of(year, month), card.getDueDay());
+        LocalDate dueDate = CardBillingCycleCalculator.atConfiguredDay(statementMonth, card.getDueDay());
         LocalDate closingDate = CardBillingCycleCalculator.closingDateForDueMonth(card, month, year);
 
         return new CardStatementResponse(card.getId(), card.getName(), month, year, dueDate, closingDate,
@@ -57,11 +53,6 @@ public class CardStatementService {
     public CardStatementResponse getCurrentStatement(Integer cardId) {
         LocalDate today = LocalDate.now();
         return getStatement(cardId, today.getMonthValue(), today.getYear());
-    }
-
-    private Expense findExpense(Integer expenseId) {
-        return expenseRepository.findById(expenseId)
-                .orElseThrow(() -> new IllegalArgumentException("Installment points to a missing expense"));
     }
 
     private void validateMonthYear(Integer month, Integer year) {

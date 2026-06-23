@@ -2,6 +2,7 @@ package com.example.prospera.repositories;
 
 import com.example.prospera.Entities.ExpenseInstallment;
 import com.example.prospera.Entities.ExpenseInstallmentId;
+import com.example.prospera.DTO.ExpenseInstallmentRecord;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
@@ -39,11 +40,30 @@ public interface ExpenseInstallmentRepository extends JpaRepository <ExpenseInst
                                                            @Param("month") Integer month,
                                                            @Param("year") Integer year);
 
+    @Query("SELECT new com.example.prospera.DTO.ExpenseInstallmentRecord(" +
+            "i.id.expenseId, i.id.installmentNumber, e.name, i.installmentAmount, i.dueDate, e.cardId) " +
+            "FROM ExpenseInstallment i, Expense e " +
+            "WHERE i.id.expenseId = e.id AND e.cardId = :cardId AND e.userId = :userId " +
+            "AND i.dueDate >= :from AND i.dueDate < :to " +
+            "ORDER BY i.dueDate ASC, i.id.installmentNumber ASC")
+    List<ExpenseInstallmentRecord> findCardStatementInstallmentRecords(@Param("userId") Integer userId,
+                                                                       @Param("cardId") Integer cardId,
+                                                                       @Param("from") LocalDate from,
+                                                                       @Param("to") LocalDate to);
+
     @Query("SELECT SUM(i.installmentAmount) FROM ExpenseInstallment i, Expense e " +
             "WHERE i.id.expenseId = e.id AND e.cardId = :cardId AND e.userId = :userId " +
             "AND MONTH(i.dueDate) = :month AND YEAR(i.dueDate) = :year")
     BigDecimal sumCardStatement(@Param("userId") Integer userId, @Param("cardId") Integer cardId,
                                 @Param("month") Integer month, @Param("year") Integer year);
+
+    @Query("SELECT SUM(i.installmentAmount) FROM ExpenseInstallment i, Expense e " +
+            "WHERE i.id.expenseId = e.id AND e.cardId = :cardId AND e.userId = :userId " +
+            "AND i.dueDate >= :from AND i.dueDate < :to")
+    BigDecimal sumCardStatementInDueDateRange(@Param("userId") Integer userId,
+                                              @Param("cardId") Integer cardId,
+                                              @Param("from") LocalDate from,
+                                              @Param("to") LocalDate to);
 
     @Query("SELECT SUM(i.installmentAmount) FROM ExpenseInstallment i, Expense e " +
             "WHERE i.id.expenseId = e.id AND e.userId = :userId AND e.cardId IS NOT NULL " +
