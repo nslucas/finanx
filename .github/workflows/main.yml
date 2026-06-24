@@ -20,7 +20,7 @@ jobs:
           script: |
             set -e
 
-            BACKEND_DIR="/opt/apps/prospera-backend"
+            BACKEND_DIR="/opt/apps/app-prospera"
             FRONTEND_DIR="/opt/apps/prospera-frontend"
 
             cd "$BACKEND_DIR"
@@ -44,4 +44,4 @@ jobs:
               docker compose up -d --build api
             fi
 
-            docker image prune -
+            docker image prune -f
