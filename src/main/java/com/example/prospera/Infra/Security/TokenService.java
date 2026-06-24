@@ -35,7 +35,7 @@ public class TokenService {
         }
     }
 
-    public String validadeToken(String token) {
+    public String validateToken(String token) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
             return JWT.require(algorithm)
@@ -44,8 +44,16 @@ public class TokenService {
                     .verify(token)
                     .getSubject();
         } catch (JWTVerificationException exception) {
-            return "";
+            return null;
         }
+    }
+
+    /**
+     * @deprecated Use {@link #validateToken(String)}.
+     */
+    @Deprecated
+    public String validadeToken(String token) {
+        return validateToken(token);
     }
 
     private Instant genExpirationDate(){

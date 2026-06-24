@@ -60,6 +60,8 @@ By default, the API is bound to `127.0.0.1:8080`, so it is reachable from the VP
 
 The production domain `appprospera.com.br` is allowed by the default CORS configuration, including `www.appprospera.com.br` and `api.appprospera.com.br`. To override the allowed origins, set `CORS_ALLOWED_ORIGIN_PATTERNS` with a comma-separated list before starting Compose.
 
+JWT sessions use `JWT_EXPIRATION_HOURS`, defaulting to 720 hours. Set a lower value in `.env` if the deployment should require users to sign in more frequently.
+
 To stop the containers:
 
 ```bash
