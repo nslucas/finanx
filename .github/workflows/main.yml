@@ -1,0 +1,50 @@
+name: Deploy Prospera
+
+on:
+  push:
+    branches:
+      - main
+
+  repository_dispatch:
+    types:
+      - deploy-prospera
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Deploy na VPS
+        uses: appleboy/ssh-action@v1.2.2
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USER }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT }}
+          script: |
+            set -e
+
+            BACKEND_DIR="/opt/apps/app-prospera"
+            FRONTEND_DIR="/opt/apps/prospera-frontend"
+
+            cd "$BACKEND_DIR"
+            git fetch origin main
+            BACKEND_CHANGED=$(git rev-parse HEAD)
+            git pull origin main
+
+            cd "$FRONTEND_DIR"
+            FRONTEND_BEFORE=$(git rev-parse HEAD)
+            git fetch origin main
+            git pull origin main
+            FRONTEND_AFTER=$(git rev-parse HEAD)
+
+            cd "$BACKEND_DIR"
+
+            if [ "$FRONTEND_BEFORE" != "$FRONTEND_AFTER" ]; then
+              echo "Frontend mudou. Rebuildando api e frontend..."
+              docker compose up -d --build
+            else
+              echo "Frontend não mudou. Rebuildando apenas api..."
+              docker compose up -d --build api
+            fi
+
+            docker image prune -f
