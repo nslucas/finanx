@@ -24,12 +24,14 @@ public class AccountService {
     private final AccountRepository accountRepository;
     private final AuthenticatedUserService authenticatedUserService;
     private final TransactionRepository transactionRepository;
+    private final UserPreferenceService userPreferenceService;
 
     public AccountService(AccountRepository accountRepository, AuthenticatedUserService authenticatedUserService,
-                          TransactionRepository transactionRepository) {
+                          TransactionRepository transactionRepository, UserPreferenceService userPreferenceService) {
         this.accountRepository = accountRepository;
         this.authenticatedUserService = authenticatedUserService;
         this.transactionRepository = transactionRepository;
+        this.userPreferenceService = userPreferenceService;
     }
 
     public List<Account> findAllActiveForAuthenticatedUser() {
@@ -83,6 +85,7 @@ public class AccountService {
         Account account = findAuthenticatedUserAccount(id);
         account.setActive(false);
         accountRepository.save(account);
+        userPreferenceService.clearAccountPreference(account.getUserId(), account.getId());
     }
 
     public Account applyDelta(Integer userId, Integer accountId, BigDecimal delta) {

@@ -24,6 +24,8 @@ class AccountServiceTest {
     private AuthenticatedUserService authenticatedUserService;
     @Mock
     private TransactionRepository transactionRepository;
+    @Mock
+    private UserPreferenceService userPreferenceService;
 
     @Test
     void createAccountWithOpeningBalanceCreatesAdjustmentTransaction() {
@@ -35,7 +37,8 @@ class AccountServiceTest {
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(user);
         when(accountRepository.save(any(Account.class))).thenReturn(savedAccount);
 
-        AccountService service = new AccountService(accountRepository, authenticatedUserService, transactionRepository);
+        AccountService service = new AccountService(accountRepository, authenticatedUserService, transactionRepository,
+                userPreferenceService);
         service.create(record);
 
         ArgumentCaptor<Transaction> transactionCaptor = ArgumentCaptor.forClass(Transaction.class);

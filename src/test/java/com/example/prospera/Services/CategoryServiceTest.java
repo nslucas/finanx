@@ -25,6 +25,8 @@ class CategoryServiceTest {
     private CategoryRepository categoryRepository;
     @Mock
     private AuthenticatedUserService authenticatedUserService;
+    @Mock
+    private UserPreferenceService userPreferenceService;
 
     @Test
     void createCategoryUsesAuthenticatedUser() {
@@ -34,7 +36,8 @@ class CategoryServiceTest {
         when(categoryRepository.findByUserIdAndNameIgnoreCaseAndActiveTrue(1, "Groceries")).thenReturn(Optional.empty());
         when(categoryRepository.save(any(Category.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        CategoryService service = new CategoryService(categoryRepository, authenticatedUserService);
+        CategoryService service = new CategoryService(categoryRepository, authenticatedUserService,
+                userPreferenceService);
         service.create(record);
 
         ArgumentCaptor<Category> captor = ArgumentCaptor.forClass(Category.class);
@@ -52,7 +55,8 @@ class CategoryServiceTest {
         when(categoryRepository.findByUserIdAndNameIgnoreCaseAndActiveTrue(1, "Groceries"))
                 .thenReturn(Optional.of(new Category(10, "Groceries", CategoryType.EXPENSE, true, 1)));
 
-        CategoryService service = new CategoryService(categoryRepository, authenticatedUserService);
+        CategoryService service = new CategoryService(categoryRepository, authenticatedUserService,
+                userPreferenceService);
 
         assertThrows(IllegalArgumentException.class, () -> service.create(record));
         verify(categoryRepository, never()).save(any(Category.class));

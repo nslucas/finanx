@@ -14,10 +14,13 @@ import java.util.List;
 public class CardService {
     private final CardRepository cardRepository;
     private final AuthenticatedUserService authenticatedUserService;
+    private final UserPreferenceService userPreferenceService;
 
-    public CardService(CardRepository cardRepository, AuthenticatedUserService authenticatedUserService) {
+    public CardService(CardRepository cardRepository, AuthenticatedUserService authenticatedUserService,
+                       UserPreferenceService userPreferenceService) {
         this.cardRepository = cardRepository;
         this.authenticatedUserService = authenticatedUserService;
+        this.userPreferenceService = userPreferenceService;
     }
 
     public List<Card> findAllActiveForAuthenticatedUser() {
@@ -65,6 +68,7 @@ public class CardService {
         Card card = findAuthenticatedUserCard(id);
         card.setActive(false);
         cardRepository.save(card);
+        userPreferenceService.clearCardPreference(card.getUserId(), card.getId());
     }
 
     public Card fromRecord(CardRecord record) {

@@ -17,10 +17,13 @@ import java.util.List;
 public class CategoryService {
     private final CategoryRepository categoryRepository;
     private final AuthenticatedUserService authenticatedUserService;
+    private final UserPreferenceService userPreferenceService;
 
-    public CategoryService(CategoryRepository categoryRepository, AuthenticatedUserService authenticatedUserService) {
+    public CategoryService(CategoryRepository categoryRepository, AuthenticatedUserService authenticatedUserService,
+                           UserPreferenceService userPreferenceService) {
         this.categoryRepository = categoryRepository;
         this.authenticatedUserService = authenticatedUserService;
+        this.userPreferenceService = userPreferenceService;
     }
 
     public List<Category> findAllActiveForAuthenticatedUser() {
@@ -86,6 +89,7 @@ public class CategoryService {
         Category category = findAuthenticatedUserCategory(id);
         category.setActive(false);
         categoryRepository.save(category);
+        userPreferenceService.clearCategoryPreference(category.getUserId(), category.getId());
     }
 
     private void validate(CategoryRecord record) {

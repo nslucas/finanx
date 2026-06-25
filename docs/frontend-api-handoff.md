@@ -684,6 +684,12 @@ Frontend guidance:
 - Most finance screens should not depend on `/users`; use JWT-owned endpoints.
 - Keep user administration separate from personal finance flows.
 
+## User Preferences
+
+Movement-entry defaults are managed through `GET /me/preferences` and `PUT /me/preferences`.
+
+See `docs/user-preferences-frontend-handoff.md` for the full contract.
+
 ## Frontend Implementation Notes
 
 - Build new screens around these primary resources: `/accounts`, `/cards`, `/transactions`, `/expenses`, `/categories`, `/budgets`, `/recurrences`, `/summary/*`, and `/alerts`.
