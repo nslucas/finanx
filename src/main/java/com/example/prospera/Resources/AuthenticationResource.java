@@ -43,7 +43,7 @@ public class AuthenticationResource {
 
             User user = (User) auth.getPrincipal();
             var token = tokenService.generateToken(user);
-            return ResponseEntity.ok(new LoginResponseDTO(token, user.getId(), user.getEmail()));
+            return ResponseEntity.ok(new LoginResponseDTO(token, user.getId(), user.getEmail(), user.getName(), user.getLastName()));
         } catch (BadCredentialsException e) {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Invalid email or password");
         } catch (Exception e) {
