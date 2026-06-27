@@ -33,6 +33,8 @@ class ConnectionServiceTest {
     private UserRepository userRepository;
     @Mock
     private UserService userService;
+    @Mock
+    private NotificationService notificationService;
 
     @Test
     void createRequestCreatesPendingConnectionFromCode() {
@@ -51,14 +53,21 @@ class ConnectionServiceTest {
             return connection;
         });
 
-        ConnectionService service = new ConnectionService(authenticatedUserService, connectionRepository,
-                userRepository, userService);
-        UserConnectionRecord record = service.createRequest(new ConnectionRequestRecord("abc12345"));
+        UserConnectionRecord record = service().createRequest(new ConnectionRequestRecord("abc12345"));
 
         assertEquals(10, record.id());
         assertEquals(ConnectionStatus.PENDING, record.status());
         assertEquals("Maria", record.requesterName());
         assertEquals("Lucas", record.targetName());
+        verify(notificationService).create(2,
+                com.example.prospera.Entities.NotificationType.CONNECTION_REQUEST_RECEIVED,
+                com.example.prospera.Entities.NotificationCategory.CONNECTION_REQUEST,
+                "Nova solicitação de conexão",
+                "Maria quer se conectar com você.",
+                "/connections",
+                "CONNECTION_REQUEST",
+                10,
+                "CONNECTION_REQUEST_RECEIVED:2:10");
     }
 
     @Test
@@ -68,11 +77,8 @@ class ConnectionServiceTest {
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(maria);
         when(userRepository.findByConnectionCode("ABC12345")).thenReturn(maria);
 
-        ConnectionService service = new ConnectionService(authenticatedUserService, connectionRepository,
-                userRepository, userService);
-
         assertThrows(IllegalArgumentException.class,
-                () -> service.createRequest(new ConnectionRequestRecord("ABC12345")));
+                () -> service().createRequest(new ConnectionRequestRecord("ABC12345")));
         verify(connectionRepository, never()).save(any());
     }
 
@@ -86,11 +92,8 @@ class ConnectionServiceTest {
         when(connectionRepository.findBetweenUsersWithStatuses(1, 2,
                 List.of(ConnectionStatus.PENDING, ConnectionStatus.ACCEPTED))).thenReturn(List.of(existing));
 
-        ConnectionService service = new ConnectionService(authenticatedUserService, connectionRepository,
-                userRepository, userService);
-
         assertThrows(IllegalArgumentException.class,
-                () -> service.createRequest(new ConnectionRequestRecord("ABC12345")));
+                () -> service().createRequest(new ConnectionRequestRecord("ABC12345")));
         verify(connectionRepository, never()).save(any());
     }
 
@@ -102,9 +105,7 @@ class ConnectionServiceTest {
         when(connectionRepository.findById(10)).thenReturn(Optional.of(pending));
         when(connectionRepository.save(any(UserConnection.class))).thenAnswer(invocation -> invocation.getArgument(0));
 
-        ConnectionService service = new ConnectionService(authenticatedUserService, connectionRepository,
-                userRepository, userService);
-        UserConnectionRecord record = service.accept(10);
+        UserConnectionRecord record = service().accept(10);
 
         assertEquals(ConnectionStatus.ACCEPTED, record.status());
     }
@@ -116,10 +117,7 @@ class ConnectionServiceTest {
         when(authenticatedUserService.getAuthenticatedUser()).thenReturn(maria);
         when(connectionRepository.findById(10)).thenReturn(Optional.of(pending));
 
-        ConnectionService service = new ConnectionService(authenticatedUserService, connectionRepository,
-                userRepository, userService);
-
-        assertThrows(IllegalArgumentException.class, () -> service.decline(10));
+        assertThrows(IllegalArgumentException.class, () -> service().decline(10));
         verify(connectionRepository, never()).save(any());
     }
 
@@ -134,10 +132,12 @@ class ConnectionServiceTest {
         when(userRepository.findById(1)).thenReturn(Optional.of(maria));
         when(userRepository.findById(2)).thenReturn(Optional.of(lucas));
 
-        ConnectionService service = new ConnectionService(authenticatedUserService, connectionRepository,
-                userRepository, userService);
+        assertEquals(1, service().findPendingRequests().size());
+    }
 
-        assertEquals(1, service.findPendingRequests().size());
+    private ConnectionService service() {
+        return new ConnectionService(authenticatedUserService, connectionRepository, userRepository, userService,
+                notificationService);
     }
 
     private User user(Integer id, String name) {

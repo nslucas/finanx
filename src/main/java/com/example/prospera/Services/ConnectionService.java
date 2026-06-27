@@ -4,6 +4,8 @@ import com.example.prospera.DTO.ConnectionCodeRecord;
 import com.example.prospera.DTO.ConnectionRequestRecord;
 import com.example.prospera.DTO.UserConnectionRecord;
 import com.example.prospera.Entities.ConnectionStatus;
+import com.example.prospera.Entities.NotificationCategory;
+import com.example.prospera.Entities.NotificationType;
 import com.example.prospera.Entities.User;
 import com.example.prospera.Entities.UserConnection;
 import com.example.prospera.Exceptions.ObjectNotFoundException;
@@ -25,15 +27,18 @@ public class ConnectionService {
     private final UserConnectionRepository connectionRepository;
     private final UserRepository userRepository;
     private final UserService userService;
+    private final NotificationService notificationService;
 
     public ConnectionService(AuthenticatedUserService authenticatedUserService,
                              UserConnectionRepository connectionRepository,
                              UserRepository userRepository,
-                             UserService userService) {
+                             UserService userService,
+                             NotificationService notificationService) {
         this.authenticatedUserService = authenticatedUserService;
         this.connectionRepository = connectionRepository;
         this.userRepository = userRepository;
         this.userService = userService;
+        this.notificationService = notificationService;
     }
 
     public ConnectionCodeRecord getAuthenticatedUserCode() {
@@ -64,7 +69,13 @@ public class ConnectionService {
 
         UserConnection connection = new UserConnection(null, requester.getId(), target.getId(),
                 ConnectionStatus.PENDING, now(), null);
-        return toRecord(connectionRepository.save(connection));
+        connection = connectionRepository.save(connection);
+        notificationService.create(target.getId(), NotificationType.CONNECTION_REQUEST_RECEIVED,
+                NotificationCategory.CONNECTION_REQUEST, "Nova solicitação de conexão",
+                requester.getName() + " quer se conectar com você.", "/connections",
+                "CONNECTION_REQUEST", connection.getId(),
+                "CONNECTION_REQUEST_RECEIVED:" + target.getId() + ":" + connection.getId());
+        return toRecord(connection);
     }
 
     public List<UserConnectionRecord> findPendingRequests() {

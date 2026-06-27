@@ -17,6 +17,9 @@ public class UserPreference {
     private Integer defaultExpenseCategoryId;
     private Integer defaultIncomeCategoryId;
     private Integer defaultInstallmentCount;
+    private Boolean notifyConnectionRequests;
+    private Boolean notifySharedExpenses;
+    private Boolean notifyFinancialDigest;
 
     public UserPreference() {
     }
@@ -33,6 +36,9 @@ public class UserPreference {
         this.defaultExpenseCategoryId = defaultExpenseCategoryId;
         this.defaultIncomeCategoryId = defaultIncomeCategoryId;
         this.defaultInstallmentCount = defaultInstallmentCount;
+        this.notifyConnectionRequests = true;
+        this.notifySharedExpenses = true;
+        this.notifyFinancialDigest = true;
     }
 
     public Integer getId() {
@@ -105,5 +111,41 @@ public class UserPreference {
 
     public void setDefaultInstallmentCount(Integer defaultInstallmentCount) {
         this.defaultInstallmentCount = defaultInstallmentCount;
+    }
+
+    public Boolean getNotifyConnectionRequests() {
+        return notifyConnectionRequests;
+    }
+
+    public boolean isNotifyConnectionRequests() {
+        return !Boolean.FALSE.equals(notifyConnectionRequests);
+    }
+
+    public void setNotifyConnectionRequests(Boolean notifyConnectionRequests) {
+        this.notifyConnectionRequests = notifyConnectionRequests;
+    }
+
+    public Boolean getNotifySharedExpenses() {
+        return notifySharedExpenses;
+    }
+
+    public boolean isNotifySharedExpenses() {
+        return !Boolean.FALSE.equals(notifySharedExpenses);
+    }
+
+    public void setNotifySharedExpenses(Boolean notifySharedExpenses) {
+        this.notifySharedExpenses = notifySharedExpenses;
+    }
+
+    public Boolean getNotifyFinancialDigest() {
+        return notifyFinancialDigest;
+    }
+
+    public boolean isNotifyFinancialDigest() {
+        return !Boolean.FALSE.equals(notifyFinancialDigest);
+    }
+
+    public void setNotifyFinancialDigest(Boolean notifyFinancialDigest) {
+        this.notifyFinancialDigest = notifyFinancialDigest;
     }
 }

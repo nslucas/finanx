@@ -4,6 +4,8 @@ import com.example.prospera.DTO.ExpenseShareRequest;
 import com.example.prospera.Entities.Expense;
 import com.example.prospera.Entities.ExpenseShare;
 import com.example.prospera.Entities.ExpenseShareStatus;
+import com.example.prospera.Entities.NotificationCategory;
+import com.example.prospera.Entities.NotificationType;
 import com.example.prospera.Entities.User;
 import com.example.prospera.Exceptions.ObjectNotFoundException;
 import com.example.prospera.repositories.ExpenseShareRepository;
@@ -12,8 +14,10 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.text.NumberFormat;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
+import java.util.Locale;
 
 @Service
 @Transactional
@@ -23,12 +27,15 @@ public class ExpenseShareService {
     private final ExpenseShareRepository shareRepository;
     private final UserRepository userRepository;
     private final ConnectionService connectionService;
+    private final NotificationService notificationService;
 
     public ExpenseShareService(ExpenseShareRepository shareRepository, UserRepository userRepository,
-                               ConnectionService connectionService) {
+                               ConnectionService connectionService,
+                               NotificationService notificationService) {
         this.shareRepository = shareRepository;
         this.userRepository = userRepository;
         this.connectionService = connectionService;
+        this.notificationService = notificationService;
     }
 
     public void createForExpense(User creator, Expense expense, ExpenseShareRequest request) {
@@ -36,7 +43,13 @@ public class ExpenseShareService {
             return;
         }
         ExpenseShare share = buildShare(null, creator, expense, request);
-        shareRepository.save(share);
+        share = shareRepository.save(share);
+        notificationService.create(share.getParticipantUserId(), NotificationType.SHARED_EXPENSE_RECEIVED,
+                NotificationCategory.SHARED_EXPENSE, "Nova despesa compartilhada",
+                creator.getName() + " compartilhou " + expense.getName() + " com você: "
+                        + formatMoney(share.getParticipantAmount()) + ".",
+                "/settlements", "EXPENSE_SHARE", share.getId(),
+                "SHARED_EXPENSE_RECEIVED:" + share.getParticipantUserId() + ":" + share.getId());
     }
 
     public void updateForExpense(User creator, Expense expense, ExpenseShareRequest request) {
@@ -111,5 +124,9 @@ public class ExpenseShareService {
 
     private LocalDateTime now() {
         return LocalDateTime.now(ZoneId.of(TIME_ZONE));
+    }
+
+    private String formatMoney(BigDecimal value) {
+        return NumberFormat.getCurrencyInstance(new Locale("pt", "BR")).format(value);
     }
 }

@@ -27,6 +27,15 @@ public class ResourceExceptionHandler {
         return ResponseEntity.status(httpStatus).body(err);
     }
 
+    @ExceptionHandler(IllegalStateException.class)
+    public ResponseEntity<StandardError> invalidState(IllegalStateException e, HttpServletRequest request){
+        HttpStatus httpStatus = HttpStatus.SERVICE_UNAVAILABLE;
+        StandardError err = new StandardError(System.currentTimeMillis(), httpStatus.value(),
+                "Service unavailable", e.getMessage(), request.getRequestURI());
+
+        return ResponseEntity.status(httpStatus).body(err);
+    }
+
     @ExceptionHandler(HttpMessageNotReadableException.class)
     public ResponseEntity<StandardError> malformedJson(HttpMessageNotReadableException e, HttpServletRequest request){
         HttpStatus httpStatus = HttpStatus.BAD_REQUEST;

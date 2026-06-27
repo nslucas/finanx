@@ -19,6 +19,8 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -31,6 +33,8 @@ class ExpenseShareServiceTest {
     private UserRepository userRepository;
     @Mock
     private ConnectionService connectionService;
+    @Mock
+    private NotificationService notificationService;
 
     @Test
     void createForExpensePersistsOpenShareForAcceptedConnection() {
@@ -39,11 +43,25 @@ class ExpenseShareServiceTest {
         when(userRepository.existsById(2)).thenReturn(true);
         when(connectionService.areConnected(1, 2)).thenReturn(true);
 
-        ExpenseShareService service = new ExpenseShareService(shareRepository, userRepository, connectionService);
-        service.createForExpense(maria, expense,
+        when(shareRepository.save(any(ExpenseShare.class))).thenAnswer(invocation -> {
+            ExpenseShare share = invocation.getArgument(0);
+            share.setId(7);
+            return share;
+        });
+
+        service().createForExpense(maria, expense,
                 new ExpenseShareRequest(2, BigDecimal.valueOf(15), BigDecimal.valueOf(40)));
 
         verify(shareRepository).save(any(ExpenseShare.class));
+        verify(notificationService).create(eq(2),
+                eq(com.example.prospera.Entities.NotificationType.SHARED_EXPENSE_RECEIVED),
+                eq(com.example.prospera.Entities.NotificationCategory.SHARED_EXPENSE),
+                eq("Nova despesa compartilhada"),
+                anyString(),
+                eq("/settlements"),
+                eq("EXPENSE_SHARE"),
+                eq(7),
+                eq("SHARED_EXPENSE_RECEIVED:2:7"));
     }
 
     @Test
@@ -53,9 +71,7 @@ class ExpenseShareServiceTest {
         when(userRepository.existsById(2)).thenReturn(true);
         when(connectionService.areConnected(1, 2)).thenReturn(true);
 
-        ExpenseShareService service = new ExpenseShareService(shareRepository, userRepository, connectionService);
-
-        assertThrows(IllegalArgumentException.class, () -> service.createForExpense(maria, expense,
+        assertThrows(IllegalArgumentException.class, () -> service().createForExpense(maria, expense,
                 new ExpenseShareRequest(2, BigDecimal.valueOf(10), BigDecimal.valueOf(40))));
         verify(shareRepository, never()).save(any());
     }
@@ -67,9 +83,7 @@ class ExpenseShareServiceTest {
         when(userRepository.existsById(2)).thenReturn(true);
         when(connectionService.areConnected(1, 2)).thenReturn(false);
 
-        ExpenseShareService service = new ExpenseShareService(shareRepository, userRepository, connectionService);
-
-        assertThrows(IllegalArgumentException.class, () -> service.createForExpense(maria, expense,
+        assertThrows(IllegalArgumentException.class, () -> service().createForExpense(maria, expense,
                 new ExpenseShareRequest(2, BigDecimal.valueOf(15), BigDecimal.valueOf(40))));
         verify(shareRepository, never()).save(any());
     }
@@ -82,9 +96,7 @@ class ExpenseShareServiceTest {
                 ExpenseShareStatus.SETTLED, LocalDateTime.now(), LocalDateTime.now());
         when(shareRepository.findByExpenseId(10)).thenReturn(Optional.of(settled));
 
-        ExpenseShareService service = new ExpenseShareService(shareRepository, userRepository, connectionService);
-
-        assertThrows(IllegalArgumentException.class, () -> service.updateForExpense(maria, expense,
+        assertThrows(IllegalArgumentException.class, () -> service().updateForExpense(maria, expense,
                 new ExpenseShareRequest(2, BigDecimal.valueOf(20), BigDecimal.valueOf(35))));
         verify(shareRepository, never()).save(any());
     }
@@ -95,10 +107,12 @@ class ExpenseShareServiceTest {
                 ExpenseShareStatus.SETTLED, LocalDateTime.now(), LocalDateTime.now());
         when(shareRepository.findByExpenseId(10)).thenReturn(Optional.of(settled));
 
-        ExpenseShareService service = new ExpenseShareService(shareRepository, userRepository, connectionService);
-
-        assertThrows(IllegalArgumentException.class, () -> service.deleteForExpense(10));
+        assertThrows(IllegalArgumentException.class, () -> service().deleteForExpense(10));
         verify(shareRepository, never()).delete(any());
+    }
+
+    private ExpenseShareService service() {
+        return new ExpenseShareService(shareRepository, userRepository, connectionService, notificationService);
     }
 
     private User user(Integer id, String name) {

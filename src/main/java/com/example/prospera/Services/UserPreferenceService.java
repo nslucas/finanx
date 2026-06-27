@@ -58,6 +58,11 @@ public class UserPreferenceService {
         preference.setDefaultInstallmentCount(record.defaultInstallmentCount() == null
                 ? DEFAULT_INSTALLMENT_COUNT
                 : record.defaultInstallmentCount());
+        if (record.notifications() != null) {
+            preference.setNotifyConnectionRequests(enabledOrDefault(record.notifications().connectionRequests()));
+            preference.setNotifySharedExpenses(enabledOrDefault(record.notifications().sharedExpenses()));
+            preference.setNotifyFinancialDigest(enabledOrDefault(record.notifications().financialDigest()));
+        }
         return new UserPreferenceRecord(preferenceRepository.save(preference));
     }
 
@@ -130,7 +135,23 @@ public class UserPreferenceService {
             preference.setDefaultInstallmentCount(DEFAULT_INSTALLMENT_COUNT);
             changed = true;
         }
+        if (preference.getNotifyConnectionRequests() == null) {
+            preference.setNotifyConnectionRequests(true);
+            changed = true;
+        }
+        if (preference.getNotifySharedExpenses() == null) {
+            preference.setNotifySharedExpenses(true);
+            changed = true;
+        }
+        if (preference.getNotifyFinancialDigest() == null) {
+            preference.setNotifyFinancialDigest(true);
+            changed = true;
+        }
         return changed;
+    }
+
+    private Boolean enabledOrDefault(Boolean value) {
+        return value == null || value;
     }
 
     private boolean clearInactiveOrMissingReferences(UserPreference preference, Integer userId) {

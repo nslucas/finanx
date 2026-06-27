@@ -49,6 +49,11 @@ public class AlertService {
     }
 
     public List<AlertRecord> getAlerts(Integer month, Integer year, LocalDate from, LocalDate to) {
+        User user = authenticatedUserService.getAuthenticatedUser();
+        return getAlertsForUser(user.getId(), month, year, from, to);
+    }
+
+    public List<AlertRecord> getAlertsForUser(Integer userId, Integer month, Integer year, LocalDate from, LocalDate to) {
         LocalDate today = LocalDate.now(clock);
         Integer alertMonth = month == null ? today.getMonthValue() : month;
         Integer alertYear = year == null ? today.getYear() : year;
@@ -56,11 +61,10 @@ public class AlertService {
         LocalDate windowEnd = to == null ? windowStart.plusDays(DEFAULT_DUE_WINDOW_DAYS) : to;
         validate(alertMonth, alertYear, windowStart, windowEnd);
 
-        User user = authenticatedUserService.getAuthenticatedUser();
         List<AlertRecord> alerts = new ArrayList<>();
-        alerts.addAll(getBudgetAlerts(user.getId(), alertMonth, alertYear));
-        alerts.addAll(getCardAlerts(user.getId(), alertMonth, alertYear, today, windowStart, windowEnd));
-        alerts.addAll(getAccountAlerts(user.getId(), alertMonth, alertYear));
+        alerts.addAll(getBudgetAlerts(userId, alertMonth, alertYear));
+        alerts.addAll(getCardAlerts(userId, alertMonth, alertYear, today, windowStart, windowEnd));
+        alerts.addAll(getAccountAlerts(userId, alertMonth, alertYear));
         Comparator<AlertRecord> alertComparator = Comparator
                 .comparingInt((AlertRecord alert) -> severityRank(alert.severity()))
                 .thenComparing(alert -> alert.dueDate() == null ? LocalDate.MAX : alert.dueDate())
