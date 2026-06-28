@@ -66,6 +66,12 @@ public interface ExpenseInstallmentRepository extends JpaRepository <ExpenseInst
                                               @Param("to") LocalDate to);
 
     @Query("SELECT SUM(i.installmentAmount) FROM ExpenseInstallment i, Expense e " +
+            "WHERE i.id.expenseId = e.id AND e.cardId = :cardId AND e.userId = :userId " +
+            "AND i.dueDate >= :from")
+    BigDecimal sumCardCommittedLimitFrom(@Param("userId") Integer userId, @Param("cardId") Integer cardId,
+                                         @Param("from") LocalDate from);
+
+    @Query("SELECT SUM(i.installmentAmount) FROM ExpenseInstallment i, Expense e " +
             "WHERE i.id.expenseId = e.id AND e.userId = :userId AND e.cardId IS NOT NULL " +
             "AND MONTH(i.dueDate) = :month AND YEAR(i.dueDate) = :year")
     BigDecimal sumCardStatementByUserIdAndDueMonth(@Param("userId") Integer userId,

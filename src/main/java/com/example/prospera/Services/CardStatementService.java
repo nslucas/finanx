@@ -41,7 +41,7 @@ public class CardStatementService {
                 user.getId(), cardId, from, to));
         BigDecimal paidAmount = zeroIfNull(cardPaymentRepository.sumByUserIdCardIdAndMonthYear(user.getId(), cardId, month, year));
         BigDecimal remainingAmount = totalAmount.subtract(paidAmount);
-        BigDecimal availableLimit = card.getCreditLimit().subtract(totalAmount);
+        BigDecimal availableLimit = card.getCreditLimit().subtract(committedLimit(user.getId(), cardId, from));
         LocalDate dueDate = CardBillingCycleCalculator.atConfiguredDay(statementMonth, card.getDueDay());
         LocalDate closingDate = CardBillingCycleCalculator.closingDateForDueMonth(card, month, year);
 
@@ -53,6 +53,14 @@ public class CardStatementService {
     public CardStatementResponse getCurrentStatement(Integer cardId) {
         LocalDate today = LocalDate.now();
         return getStatement(cardId, today.getMonthValue(), today.getYear());
+    }
+
+    private BigDecimal committedLimit(Integer userId, Integer cardId, LocalDate from) {
+        BigDecimal installmentsTotal = zeroIfNull(installmentRepository.sumCardCommittedLimitFrom(userId, cardId, from));
+        BigDecimal paymentsTotal = zeroIfNull(cardPaymentRepository.sumByUserIdAndCardIdFromMonthYear(
+                userId, cardId, from.getMonthValue(), from.getYear()));
+        BigDecimal committed = installmentsTotal.subtract(paymentsTotal);
+        return committed.compareTo(BigDecimal.ZERO) > 0 ? committed : BigDecimal.ZERO;
     }
 
     private void validateMonthYear(Integer month, Integer year) {
